@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import ImageSlider from '@/components/ImageSlider';
+import NewsSlider from '@/components/NewsSlider';
 import Link from 'next/link';
 
 export const revalidate = 0; // Disable cache for demo purposes so admin changes show immediately
@@ -7,7 +8,7 @@ export const revalidate = 0; // Disable cache for demo purposes so admin changes
 export default async function Home() {
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: 'desc' },
-    take: 3 // Based on screenshot, usually 3 or 2 per row
+    take: 10 // Increased to allow slider demonstration
   });
 
   return (
@@ -64,7 +65,7 @@ export default async function Home() {
             <em>Bismillahirrahmanirrahim</em>
           </p>
           <p style={{ color: '#475569', marginBottom: '15px', fontSize: '0.95rem' }}>
-            <em>Assalamu'alaikum Warahmatullahi Wabarakatuh</em>
+            <em>Assalamu&apos;alaikum Warahmatullahi Wabarakatuh</em>
           </p>
           <p style={{ color: '#475569', marginBottom: '15px', lineHeight: '1.8', fontSize: '0.95rem' }}>
             Puji syukur kami panjatkan kehadirat Allah SWT atas limpahan rahmat-Nya sehingga SMP NEGERI 3 CIBUNGBULANG dapat menyajikan website sekolah. Kemajuan teknologi di era informasi digital menuntut kami untuk terus berinovasi dalam memberikan layanan publik yang terbaik bagi peserta didik, orang tua, dan masyarakat.
@@ -201,27 +202,7 @@ export default async function Home() {
       <section style={{ borderTop: '1px solid #f1f5f9', paddingTop: '60px', marginBottom: '80px' }} id="berita">
         <h2 className="section-title" style={{ color: '#1e293b' }}>Berita & Kegiatan</h2>
         
-        {posts.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#64748b' }}>Belum ada pengumuman.</p>
-        ) : (
-          <div className="content-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-            {posts.map(post => (
-              <div key={post.id} className="berita-card">
-                <span className="quote-icon">"</span>
-                <h3 className="berita-title">{post.title}</h3>
-                <p className="berita-excerpt">
-                  {post.content.length > 120 ? post.content.substring(0, 120) + '...' : post.content}
-                </p>
-                <p className="berita-meta" style={{ marginTop: '15px', marginBottom: '0' }}>
-                  Dipublikasikan pada: {new Date(post.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </p>
-                <Link href={`/berita/${post.id || 'slug'}`} className="read-more-btn">
-                  Read More
-                </Link>
-              </div>
-            ))}
-          </div>
-        )}
+        <NewsSlider posts={posts} />
       </section>
     </main>
   );

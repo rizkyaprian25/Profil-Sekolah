@@ -38,7 +38,7 @@ export default function Page() {
           <div style={{ flex: '1', minWidth: '300px', color: '#475569', lineHeight: '1.8', fontSize: '1.05rem' }}>
             <p style={{ marginBottom: '20px' }}>
               Bismillahirrahmanirrahim<br/><br/>
-              Assalamu'alaikum Warahmatullahi Wabarakatuh
+              Assalamu&apos;alaikum Warahmatullahi Wabarakatuh
             </p>
 
             <p style={{ marginBottom: '20px' }}>
@@ -59,7 +59,7 @@ export default function Page() {
 
             <p>
               Terimakasih.<br/><br/>
-              Wassalamu'alaikum. Warahmatullahi Wabarakatuh.
+              Wassalamu&apos;alaikum. Warahmatullahi Wabarakatuh.
             </p>
           </div>
 

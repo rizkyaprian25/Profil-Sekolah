@@ -11,7 +11,7 @@ Website ini dikembangkan untuk menjadi portal informasi digital resmi bagi SMPN 
 - **Portal Berita & Publikasi**: Memiliki sistem yang mudah di-_update_ (melalui Admin Panel) untuk publikasi berita, kegiatan, dan prestasi siswa/sekolah.
 
 ## 3. Arsitektur & Teknologi
-- **Framework Frontend/Backend:** Next.js 14 (App Router)
+- **Framework Frontend/Backend:** Next.js 15/16+ (App Router dengan Turbopack)
 - **Styling:** Vanilla CSS (`global.css`) tanpa framework (seperti Tailwind) sesuai kebutuhan spesifik (*organic design*).
 - **Database ORM:** Prisma
 - **Database Engine:** SQLite (File-based, untuk kemudahan pengembangan/deployment awal)
@@ -26,12 +26,13 @@ Website ini dikembangkan untuk menjadi portal informasi digital resmi bagi SMPN 
   - Cuplikan Sambutan Kepala Sekolah dengan tautan ke halaman detail.
   - Kartu Prestasi Siswa terbaru (layout tabular, aksen warna warni).
   - Profil Singkat Guru dan Pegawai (kartu dengan _blue name tag_).
-  - Berita & Kegiatan Sekolah (layout bergaya kutipan/_quote box_ eksklusif).
-- **Halaman Detail Dinamis (`/prestasi/[slug]`, `/guru/[slug]`, `/berita/[slug]`):** 
+  - Berita & Kegiatan Sekolah (layout interaktif dengan _Responsive Horizontal Slider_, panah navigasi, desain kotak putih-abu elegan, dan tombol _Selengkapnya_ kuning).
+- **Halaman Detail Dinamis (`/prestasi/[slug]`, `/guru/[slug]`, `/berita/[id]`):** 
+  - Menggunakan resolusi rute asinkron (`await params`) sesuai standar rilis Next.js terbaru.
   - Menampilkan informasi lengkap berdasarkan ID/Slug yang dipilih dari halaman beranda.
 - **Navigasi & Footer:**
   - Header lengket (_sticky navbar_) yang interaktif dengan menu _dropdown_ (Profil, Prestasi, Berita).
-  - Footer komprehensif berisi alamat lengkap, kontak (Telepon/Email), media sosial (Instagram, TikTok, YouTube), serta Google Maps interaktif tersemat (_embed_).
+  - Footer komprehensif berisi alamat lengkap (SMPN 3 Cibungbulang, Cijujung), kontak (Telepon/Email), media sosial, serta Google Maps interaktif tersemat (_embed_) yang akurat.
 
 ### 4.2. Panel Admin (Backend CMS)
 - **Halaman Login:** Keamanan akses untuk administrator menggunakan kredensial yang tersimpan di _database_.
