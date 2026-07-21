@@ -11,11 +11,11 @@ export async function DELETE(request, { params }) {
     // await jwtVerify(token, secret);
 
     const { id } = await params;
-    await prisma.post.delete({
+    await prisma.achievement.delete({
       where: { id }
     });
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete post' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to delete achievement' }, { status: 500 });
   }
 }

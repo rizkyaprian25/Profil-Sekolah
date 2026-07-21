@@ -4,12 +4,12 @@ import { jwtVerify } from 'jose';
 
 export async function GET() {
   try {
-    const posts = await prisma.post.findMany({
+    const achievements = await prisma.achievement.findMany({
       orderBy: { createdAt: 'desc' }
     });
-    return NextResponse.json(posts);
+    return NextResponse.json(achievements);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch achievements' }, { status: 500 });
   }
 }
 
@@ -21,12 +21,12 @@ export async function POST(request) {
     // const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'default_secret_key');
     // await jwtVerify(token, secret);
 
-    const { title, content, imageUrl } = await request.json();
-    const newPost = await prisma.post.create({
-      data: { title, content, imageUrl }
+    const { title, category, studentName, level, imageUrl } = await request.json();
+    const newAchievement = await prisma.achievement.create({
+      data: { title, category, studentName, level, imageUrl }
     });
-    return NextResponse.json(newPost);
+    return NextResponse.json(newAchievement);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create post' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create achievement' }, { status: 500 });
   }
 }

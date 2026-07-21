@@ -11,6 +11,14 @@ export default async function Home() {
     take: 10 // Increased to allow slider demonstration
   });
 
+  const achievements = await prisma.achievement.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 3
+  });
+
+  // Helper colors for achievement cards based on index
+  const borderColors = ['#2563eb', '#16a34a', '#d97706', '#9333ea', '#db2777'];
+
   return (
     <main className="container" style={{ paddingBottom: '0' }}>
       
@@ -84,74 +92,34 @@ export default async function Home() {
         <h2 className="section-title" style={{ color: '#1e293b' }}>Prestasi Siswa</h2>
         <div className="content-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
           
-          <Link href="/prestasi/juara-1-sains-nasional" className="prestasi-card">
-            <div className="prestasi-image-wrapper" style={{ borderBottomColor: '#2563eb' }}>
-              <img src="/images/prestasi1.png" alt="Prestasi" />
-            </div>
-            <h3 className="prestasi-title">Juara 1 Lomba Sains Tingkat Nasional</h3>
-            <table className="prestasi-meta-table">
-              <tbody>
-                <tr>
-                  <td style={{ width: '40%' }}>Kategori</td>
-                  <td>Akademik</td>
-                </tr>
-                <tr>
-                  <td>Oleh</td>
-                  <td>Anisa Rahma</td>
-                </tr>
-                <tr>
-                  <td>Tingkat</td>
-                  <td>Nasional</td>
-                </tr>
-              </tbody>
-            </table>
-          </Link>
-
-          <Link href="/prestasi/medali-emas-olimpiade" className="prestasi-card">
-            <div className="prestasi-image-wrapper" style={{ borderBottomColor: '#16a34a' }}>
-              <img src="/images/prestasi1.png" alt="Prestasi" />
-            </div>
-            <h3 className="prestasi-title">Medali Emas Olimpiade Matematika</h3>
-            <table className="prestasi-meta-table">
-              <tbody>
-                <tr>
-                  <td style={{ width: '40%' }}>Kategori</td>
-                  <td>Akademik</td>
-                </tr>
-                <tr>
-                  <td>Oleh</td>
-                  <td>Budi Santoso</td>
-                </tr>
-                <tr>
-                  <td>Tingkat</td>
-                  <td>Nasional</td>
-                </tr>
-              </tbody>
-            </table>
-          </Link>
-
-          <Link href="/prestasi/juara-1-renang" className="prestasi-card">
-            <div className="prestasi-image-wrapper" style={{ borderBottomColor: '#d97706' }}>
-              <img src="/images/prestasi1.png" alt="Prestasi" />
-            </div>
-            <h3 className="prestasi-title">Juara 1 Kejuaraan Renang Antar Pelajar</h3>
-            <table className="prestasi-meta-table">
-              <tbody>
-                <tr>
-                  <td style={{ width: '40%' }}>Kategori</td>
-                  <td>Non-Akademik</td>
-                </tr>
-                <tr>
-                  <td>Oleh</td>
-                  <td>Kirana Larasati</td>
-                </tr>
-                <tr>
-                  <td>Tingkat</td>
-                  <td>Provinsi</td>
-                </tr>
-              </tbody>
-            </table>
-          </Link>
+          {achievements.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#64748b', gridColumn: '1 / -1' }}>Belum ada data prestasi.</p>
+          ) : (
+            achievements.map((ach, index) => (
+              <Link href={`/prestasi/${ach.id}`} className="prestasi-card" key={ach.id}>
+                <div className="prestasi-image-wrapper" style={{ borderBottomColor: borderColors[index % borderColors.length] }}>
+                  <img src={ach.imageUrl || '/images/prestasi1.png'} alt={ach.title} />
+                </div>
+                <h3 className="prestasi-title">{ach.title}</h3>
+                <table className="prestasi-meta-table">
+                  <tbody>
+                    <tr>
+                      <td style={{ width: '40%' }}>Kategori</td>
+                      <td>{ach.category}</td>
+                    </tr>
+                    <tr>
+                      <td>Oleh</td>
+                      <td>{ach.studentName}</td>
+                    </tr>
+                    <tr>
+                      <td>Tingkat</td>
+                      <td>{ach.level}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </Link>
+            ))
+          )}
 
         </div>
         <div style={{ textAlign: 'center', marginBottom: '80px' }}>
