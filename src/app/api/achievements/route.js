@@ -1,6 +1,9 @@
+import { isAuthenticated } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { jwtVerify } from 'jose';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
@@ -14,16 +17,13 @@ export async function GET() {
 }
 
 export async function POST(request) {
+  if (!await isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
-    // const token = request.cookies.get('admin_session')?.value;
-    // if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    
 
-    // const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'default_secret_key');
-    // await jwtVerify(token, secret);
-
-    const { title, category, studentName, level, imageUrl } = await request.json();
+    const { title, category, studentName, level, imageUrl, description } = await request.json();
     const newAchievement = await prisma.achievement.create({
-      data: { title, category, studentName, level, imageUrl }
+      data: { title, category, studentName, level, imageUrl, description }
     });
     return NextResponse.json(newAchievement);
   } catch (error) {

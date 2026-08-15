@@ -43,3 +43,22 @@ yarn-error.log*
 # Typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Scratch files & local db
+dev.db
+*.db-journal
+*.html
+*.txt
+scratch_*.html
+*_part.html
+
+# Seed and utility scripts
+seed_*.js
+check_db.js
+test_db.js
+fix_auth.js
+generate-pages.js
+
+# Uploaded Media
+/public/uploads/*
+!/public/uploads/.gitkeep

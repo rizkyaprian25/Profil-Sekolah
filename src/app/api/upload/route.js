@@ -3,13 +3,13 @@ import { writeFile } from 'fs/promises';
 import path from 'path';
 import { jwtVerify } from 'jose';
 
+import { isAuthenticated } from '@/lib/auth';
+
 export async function POST(request) {
   try {
-    // 1. Verify Authentication (Bypassed for now)
-    // const token = request.cookies.get('admin_session')?.value;
-    // if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'default_secret_key');
-    // await jwtVerify(token, secret);
+    if (!await isAuthenticated()) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     // 2. Parse Form Data
     const data = await request.formData();
@@ -17,6 +17,18 @@ export async function POST(request) {
 
     if (!file) {
       return NextResponse.json({ error: 'No image file found' }, { status: 400 });
+    }
+
+    // MIME type check
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+    if (!allowedMimeTypes.includes(file.type)) {
+      return NextResponse.json({ error: 'Invalid file type. Only images are allowed.' }, { status: 400 });
+    }
+
+    // Size limit check (5MB)
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json({ error: 'File size exceeds 5MB limit.' }, { status: 400 });
     }
 
     // 3. Save File

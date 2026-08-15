@@ -8,6 +8,7 @@ export default function AdminAchievements() {
   const [category, setCategory] = useState('Akademik');
   const [studentName, setStudentName] = useState('');
   const [level, setLevel] = useState('Sekolah');
+  const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ message: '', type: '' });
@@ -61,7 +62,7 @@ export default function AdminAchievements() {
       const res = await fetch('/api/achievements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, category, studentName, level, imageUrl })
+        body: JSON.stringify({ title, category, studentName, level, imageUrl, description })
       });
       
       if (res.ok) {
@@ -69,6 +70,7 @@ export default function AdminAchievements() {
         setCategory('Akademik');
         setStudentName('');
         setLevel('Sekolah');
+        setDescription('');
         setImageFile(null);
         e.target.reset(); // Reset file input
         showNotification('Prestasi berhasil ditambahkan!', 'success');
@@ -184,6 +186,19 @@ export default function AdminAchievements() {
               />
             </div>
 
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Deskripsi / Ucapan (Opsional)</label>
+              <textarea 
+                value={description} 
+                onChange={e => setDescription(e.target.value)} 
+                placeholder="Misal: Alhamdulillah, selamat dan sukses atas pencapaian..."
+                rows={4}
+                style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none', resize: 'vertical' }}
+                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+              />
+            </div>
+
             <div style={{ marginBottom: '25px' }}>
               <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Gambar Prestasi (Wajib)</label>
               <input 
@@ -193,6 +208,15 @@ export default function AdminAchievements() {
                 onChange={e => setImageFile(e.target.files[0])}
                 style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
               />
+              {imageFile && (
+                <div style={{ marginTop: '10px' }}>
+                  <img 
+                    src={URL.createObjectURL(imageFile)} 
+                    alt="Preview" 
+                    style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }} 
+                  />
+                </div>
+              )}
             </div>
 
             <button type="submit" disabled={loading} style={{ 

@@ -142,6 +142,15 @@ export default function AdminPosts() {
                 onChange={e => setImageFile(e.target.files[0])}
                 style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
               />
+              {imageFile && (
+                <div style={{ marginTop: '10px' }}>
+                  <img 
+                    src={URL.createObjectURL(imageFile)} 
+                    alt="Preview" 
+                    style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }} 
+                  />
+                </div>
+              )}
             </div>
             <div style={{ marginBottom: '25px' }}>
               <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Isi Berita</label>

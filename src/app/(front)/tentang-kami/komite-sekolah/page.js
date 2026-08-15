@@ -1,0 +1,79 @@
+import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
+
+export const revalidate = 0; // Disable cache for demo purposes
+
+export default async function Page() {
+  const komite = await prisma.komite.findFirst();
+
+  return (
+    <main style={{ paddingBottom: '0', background: '#f8f9fa' }}>
+      {/* Banner / Hero Section */}
+      <section style={{ 
+        position: 'relative', 
+        height: '250px', 
+        background: 'linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)), url("/images/slide1.png") center/cover',
+        display: 'flex',
+        alignItems: 'center',
+        overflow: 'hidden',
+        borderBottom: '3px solid #1E90FF'
+      }}>
+        <div className="container" style={{ position: 'relative', zIndex: '2', width: '100%', display: 'flex', alignItems: 'center' }}>
+          <h1 style={{ color: 'white', fontSize: '2.5rem', fontWeight: 'bold', textShadow: '2px 2px 4px rgba(0,0,0,0.8)', zIndex: 3 }}>
+            Komite Sekolah
+          </h1>
+        </div>
+      </section>
+
+      {/* Content Section */}
+      <section style={{ background: 'white', padding: '60px 0 80px 0', minHeight: '600px' }}>
+        <div className="container">
+          <h2 style={{ fontSize: '2.5rem', color: '#0f172a', marginBottom: '40px', fontWeight: '400' }}>
+            {komite?.title || 'Komite Sekolah'}
+          </h2>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '40px' }} className="komite-grid">
+            {/* Responsiveness */}
+            <style dangerouslySetInnerHTML={{__html: `
+              @media (min-width: 992px) {
+                .komite-grid { grid-template-columns: 2fr 1.5fr !important; }
+              }
+            `}} />
+
+            {/* Kolom Teks */}
+            <div style={{ color: '#64748b', lineHeight: '1.8', fontSize: '1.05rem', textAlign: 'justify' }}>
+              {komite?.content ? (
+                komite.content.split('\n').filter(p => p.trim() !== '').map((paragraph, idx) => (
+                  <p key={idx} style={{ marginBottom: '20px' }}>
+                    {paragraph}
+                  </p>
+                ))
+              ) : (
+                <p>Belum ada data komite sekolah yang dimasukkan.</p>
+              )}
+            </div>
+
+            {/* Kolom Foto Grid */}
+            <div style={{ textAlign: 'center' }}>
+              <div style={{
+                display: 'inline-block',
+                background: '#e2e8f0',
+                padding: '10px',
+                border: '5px solid #cbd5e1',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                width: '100%'
+              }}>
+                <img 
+                  src={komite?.photoUrl || "/images/slide1.png"} 
+                  alt="Struktur Komite Sekolah" 
+                  style={{ width: '100%', height: 'auto', display: 'block' }}
+                />
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
