@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import Image from 'next/image';
 
-export const revalidate = 0; // Disable cache for demo purposes
+export const revalidate = 60; // Disable cache for demo purposes
 
 export default async function Page() {
   const kepsek = await prisma.kepalaSekolah.findFirst();
@@ -94,9 +95,10 @@ export default async function Page() {
                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
                 width: '100%'
               }}>
-                <img 
+                <Image className="zoomable-image" 
                   src={kepsek?.photoUrl || "/images/slide1.png"} 
                   alt="Galeri Kepala Sekolah" 
+                  width={400} height={400}
                   style={{ width: '100%', height: 'auto', display: 'block' }}
                 />
               </div>

@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import Image from 'next/image';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function Page() {
   const posts = await prisma.post.findMany({
@@ -12,7 +13,7 @@ export default async function Page() {
     <main>
       {/* Jumbotron/Header Style */}
       <div style={{
-        background: 'linear-gradient(rgba(0, 0, 0, .2), rgba(0, 0, 0, .2)), url(/images/hero-bg.png) center center no-repeat',
+        background: 'linear-gradient(rgba(0, 0, 0, .2), rgba(0, 0, 0, .2)), url(/images/slide1.png) center center no-repeat',
         backgroundSize: 'cover',
         height: '270px',
         display: 'flex',
@@ -43,9 +44,11 @@ export default async function Page() {
                   marginBottom: '20px',
                   overflow: 'hidden'
                 }}>
-                  <img 
-                    src={post.imageUrl || '/images/hero-bg.png'} 
+                  <Image className="zoomable-image" 
+                    src={post.imageUrl || '/images/slide1.png'} 
                     alt={post.title} 
+                    width={400} 
+                    height={300}
                     style={{ 
                       width: '100%', 
                       height: '100%', 
@@ -74,7 +77,10 @@ export default async function Page() {
                     marginBottom: '20px',
                     textAlign: 'justify'
                   }}>
-                    {post.content.length > 180 ? post.content.substring(0, 180) + '...' : post.content}
+                    {(() => {
+                      const plainText = post.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
+                      return plainText.length > 180 ? plainText.substring(0, 180) + '...' : plainText;
+                    })()}
                   </p>
                   
                   {/* Read More Button */}

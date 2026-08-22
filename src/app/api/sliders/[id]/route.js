@@ -1,12 +1,14 @@
 import { isAuthenticated } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { unlink } from 'fs/promises';
+import path from 'path';
 
 const prisma = new PrismaClient();
 
 export async function PUT(request, { params }) {
-  const { id } = params;
   try {
+    const { id } = await params;
     const data = await request.json();
     const updatedSlider = await prisma.slider.update({
       where: { id },
@@ -24,13 +26,11 @@ export async function PUT(request, { params }) {
   }
 }
 
-import { unlink } from 'fs/promises';
-import path from 'path';
-
 export async function DELETE(request, { params }) {
   if (!await isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const { id } = params;
+  
   try {
+    const { id } = await params;
     const record = await prisma.slider.findUnique({ where: { id } });
     if (record && record.imageUrl) {
       try {

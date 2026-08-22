@@ -1,4 +1,7 @@
 import './global.css';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata = {
   title: 'Profil Sekolah',
@@ -7,7 +10,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="id">
+    <html lang="id" className={inter.className}>
       <body>
         {children}
       </body>

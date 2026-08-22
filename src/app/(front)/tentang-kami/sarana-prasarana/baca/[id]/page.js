@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function Page({ params }) {
   const { id } = await params;
@@ -77,7 +77,7 @@ export default async function Page({ params }) {
             {/* Kolom Kanan (Gambar) */}
             <div style={{ textAlign: 'center' }}>
               {sarana.photoUrl ? (
-                <img 
+                <img className="zoomable-image" 
                   src={sarana.photoUrl} 
                   alt={sarana.title} 
                   style={{ 

@@ -10,6 +10,8 @@ export default function AdminAchievements() {
   const [level, setLevel] = useState('Sekolah');
   const [description, setDescription] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [existingImageUrl, setExistingImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ message: '', type: '' });
 
@@ -37,7 +39,7 @@ export default function AdminAchievements() {
     setLoading(true);
     
     try {
-      let imageUrl = '';
+      let finalImageUrl = existingImageUrl;
       
       // Upload image first if selected
       if (imageFile) {
@@ -51,7 +53,7 @@ export default function AdminAchievements() {
         
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
-          imageUrl = uploadData.imageUrl;
+          finalImageUrl = uploadData.imageUrl;
         } else {
           showNotification('Gagal mengunggah gambar.', 'error');
           setLoading(false);
@@ -59,11 +61,22 @@ export default function AdminAchievements() {
         }
       }
 
-      const res = await fetch('/api/achievements', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, category, studentName, level, imageUrl, description })
-      });
+      const payload = { title, category, studentName, level, imageUrl: finalImageUrl, description };
+      let res;
+
+      if (editingId) {
+        res = await fetch(`/api/achievements/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } else {
+        res = await fetch('/api/achievements', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      }
       
       if (res.ok) {
         setTitle('');
@@ -72,17 +85,42 @@ export default function AdminAchievements() {
         setLevel('Sekolah');
         setDescription('');
         setImageFile(null);
-        e.target.reset(); // Reset file input
-        showNotification('Prestasi berhasil ditambahkan!', 'success');
+        setEditingId(null);
+        setExistingImageUrl('');
+        if (e.target) e.target.reset(); // Reset file input
+        showNotification(editingId ? 'Prestasi berhasil diperbarui!' : 'Prestasi berhasil ditambahkan!', 'success');
         fetchAchievements();
       } else {
-        showNotification('Gagal menambahkan prestasi (Unauthorized).', 'error');
+        showNotification('Gagal menyimpan prestasi (Unauthorized).', 'error');
       }
     } catch (err) {
       showNotification('Terjadi kesalahan jaringan.', 'error');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (ach) => {
+    setTitle(ach.title);
+    setCategory(ach.category || 'Akademik');
+    setStudentName(ach.studentName);
+    setLevel(ach.level || 'Sekolah');
+    setDescription(ach.description || '');
+    setEditingId(ach.id);
+    setExistingImageUrl(ach.imageUrl || '');
+    setImageFile(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setTitle('');
+    setCategory('Akademik');
+    setStudentName('');
+    setLevel('Sekolah');
+    setDescription('');
+    setEditingId(null);
+    setExistingImageUrl('');
+    setImageFile(null);
   };
 
   const handleDelete = async (id) => {
@@ -124,7 +162,7 @@ export default function AdminAchievements() {
         {/* Form Add Post */}
         <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden', height: 'fit-content' }}>
           <div style={{ background: '#f8fafc', padding: '20px', borderBottom: '1px solid #e2e8f0' }}>
-            <h3 style={{ margin: 0, color: '#334155' }}>Tambah Prestasi Baru</h3>
+            <h3 style={{ margin: 0, color: '#334155' }}>{editingId ? 'Ubah Prestasi' : 'Tambah Prestasi Baru'}</h3>
           </div>
           <form onSubmit={handleSubmit} style={{ padding: '25px' }}>
             <div style={{ marginBottom: '20px' }}>
@@ -204,11 +242,10 @@ export default function AdminAchievements() {
               <input 
                 type="file" 
                 accept="image/*"
-                required
                 onChange={e => setImageFile(e.target.files[0])}
                 style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
               />
-              {imageFile && (
+              {imageFile ? (
                 <div style={{ marginTop: '10px' }}>
                   <img 
                     src={URL.createObjectURL(imageFile)} 
@@ -216,16 +253,39 @@ export default function AdminAchievements() {
                     style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }} 
                   />
                 </div>
-              )}
+              ) : existingImageUrl ? (
+                <div style={{ marginTop: '10px' }}>
+                  <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '5px' }}>Gambar Saat Ini:</p>
+                  <img 
+                    src={existingImageUrl} 
+                    alt="Current" 
+                    style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }} 
+                  />
+                </div>
+              ) : null}
             </div>
 
-            <button type="submit" disabled={loading} style={{ 
-              width: '100%', background: '#3b82f6', color: 'white', padding: '12px', border: 'none', 
-              borderRadius: '6px', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '1rem',
-              transition: 'background 0.2s'
-            }}>
-              {loading ? 'Menyimpan...' : 'Tambah Prestasi'}
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button type="submit" disabled={loading} style={{ 
+                flex: 1, background: '#3b82f6', color: 'white', padding: '12px', border: 'none', 
+                borderRadius: '6px', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '1rem',
+                transition: 'background 0.2s'
+              }}>
+                {loading ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Tambah Prestasi')}
+              </button>
+              {editingId && (
+                <button 
+                  type="button" 
+                  onClick={handleCancelEdit} 
+                  style={{ 
+                    background: '#ef4444', color: 'white', padding: '12px 20px', border: 'none', 
+                    borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem'
+                  }}
+                >
+                  Batal
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
@@ -263,17 +323,30 @@ export default function AdminAchievements() {
                           <strong>Kategori:</strong> {ach.category} | <strong>Tingkat:</strong> {ach.level}
                         </div>
                       </div>
-                      <button 
-                        onClick={() => handleDelete(ach.id)} 
-                        style={{ 
-                          background: '#fee2e2', color: '#ef4444', padding: '8px 12px', border: '1px solid #fecaca', 
-                          borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s', flexShrink: 0
-                        }}
-                        onMouseOver={(e) => { e.target.style.background = '#ef4444'; e.target.style.color = 'white'; }}
-                        onMouseOut={(e) => { e.target.style.background = '#fee2e2'; e.target.style.color = '#ef4444'; }}
-                      >
-                        Hapus
-                      </button>
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <button 
+                          onClick={() => handleEdit(ach)} 
+                          style={{ 
+                            background: '#fef08a', color: '#a16207', padding: '8px 12px', border: '1px solid #fde047', 
+                            borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s', flexShrink: 0
+                          }}
+                          onMouseOver={(e) => { e.target.style.background = '#eab308'; e.target.style.color = 'white'; }}
+                          onMouseOut={(e) => { e.target.style.background = '#fef08a'; e.target.style.color = '#a16207'; }}
+                        >
+                          Ubah
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(ach.id)} 
+                          style={{ 
+                            background: '#fee2e2', color: '#ef4444', padding: '8px 12px', border: '1px solid #fecaca', 
+                            borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s', flexShrink: 0
+                          }}
+                          onMouseOver={(e) => { e.target.style.background = '#ef4444'; e.target.style.color = 'white'; }}
+                          onMouseOut={(e) => { e.target.style.background = '#fee2e2'; e.target.style.color = '#ef4444'; }}
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </div>
                   </li>
                 ))}

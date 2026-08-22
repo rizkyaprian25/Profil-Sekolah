@@ -1,12 +1,14 @@
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import Link from 'next/link';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function Page({ params }) {
-  const { id } = await params;
+  const { id, slug } = await params;
   
+  console.log("SDM DETAIL PARAMS:", { id, slug });
   // Ambil data dari database berdasarkan ID
   const teacher = await prisma.teacher.findUnique({
     where: { id }
@@ -16,10 +18,6 @@ export default async function Page({ params }) {
     notFound();
   }
 
-  // Jika kita belum punya Jenis Kelamin di database, kita render placeholder "Laki-laki/Perempuan" secara default 
-  // atau menggunakan field lain. Di sini kita hardcode untuk menyamai visual,
-  // namun idealnya ditambahkan ke prisma.schema
-  const gender = "Laki-laki"; 
 
   return (
     <>
@@ -99,9 +97,7 @@ export default async function Page({ params }) {
           
           <div style={{ animation: 'fade-up 0.5s ease-out' }}>
             <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: '#1e293b', fontWeight: '700' }}>{teacher.name}</h2>
-            <div style={{ display: 'inline-block', padding: '6px 16px', background: '#e0f2fe', color: '#0369a1', borderRadius: '50px', fontSize: '0.95rem', fontWeight: '600', marginBottom: '2rem' }}>
-              Jenis Kelamin: {gender}
-            </div>
+
             
             <div style={{ padding: '24px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', color: '#475569', fontSize: '1.1rem', lineHeight: '1.8' }}>
               <h3 style={{ fontSize: '1.2rem', color: '#1e293b', marginBottom: '10px' }}>Peran & Tanggung Jawab</h3>
@@ -118,10 +114,11 @@ export default async function Page({ params }) {
               borderRadius: '16px', overflow: 'hidden',
               boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
             }}>
-              <img 
+              <Image className="zoomable-image" 
                 src={teacher.photoUrl || '/images/guru1.png'} 
                 alt={teacher.name} 
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                width={400} height={400}
+                style={{ width: '100%', height: 'auto', display: 'block' }}
               />
             </div>
           </div>

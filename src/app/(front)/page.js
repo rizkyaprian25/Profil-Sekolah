@@ -3,8 +3,9 @@ import ImageSlider from '@/components/ImageSlider';
 import NewsSlider from '@/components/NewsSlider';
 import ScrollAnimation from '@/components/ScrollAnimation';
 import Link from 'next/link';
+import Image from 'next/image';
 
-export const revalidate = 0; // Disable cache for demo purposes so admin changes show immediately
+export const revalidate = 60; // Disable cache for demo purposes so admin changes show immediately
 
 export default async function Home() {
   const posts = await prisma.post.findMany({
@@ -93,7 +94,7 @@ export default async function Home() {
         <div className="flex-image">
           <ScrollAnimation animation="slide-left">
             <div style={{ padding: '8px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-              <img src={sambutan?.photoUrl || "/images/kepsek.png"} alt="Kepala Sekolah" style={{ width: '100%', height: 'auto', borderRadius: '8px', display: 'block' }} />
+              <Image src={sambutan?.photoUrl || "/images/kepsek.png"} alt="Kepala Sekolah" width={400} height={400} className="zoomable-image" style={{ width: '100%', height: 'auto', borderRadius: '8px', display: 'block' }} />
             </div>
           </ScrollAnimation>
         </div>
@@ -139,7 +140,7 @@ export default async function Home() {
               <ScrollAnimation animation="fade-up" delay={index * 150} key={ach.id}>
                 <Link href={`/prestasi/${ach.id}`} className="prestasi-card" style={{ height: '100%' }}>
                   <div className="prestasi-image-wrapper" style={{ borderBottomColor: borderColors[index % borderColors.length] }}>
-                    <img src={ach.imageUrl || '/images/prestasi1.png'} alt={ach.title} />
+                    <Image src={ach.imageUrl || '/images/prestasi1.png'} alt={ach.title} width={400} height={300} className="zoomable-image" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                   <h3 className="prestasi-title">{ach.title}</h3>
                   <table className="prestasi-meta-table">
@@ -186,7 +187,7 @@ export default async function Home() {
               <ScrollAnimation animation="fade-up" delay={(index + 1) * 100} key={teacher.id}>
                 {/* Updated link to match the requested route */}
                 <Link href={`/sdm/lihat/${teacher.id}/detail`} className="guru-card">
-                  <img src={teacher.photoUrl || '/images/guru1.png'} alt={teacher.name} className="guru-image" />
+                  <Image src={teacher.photoUrl || '/images/guru1.png'} alt={teacher.name} className="guru-image zoomable-image" width={300} height={300} />
                   <div className="guru-name-tag">
                     {teacher.name}
                   </div>

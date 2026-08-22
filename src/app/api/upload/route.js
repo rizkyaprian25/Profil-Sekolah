@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
 import path from 'path';
-import { jwtVerify } from 'jose';
+import sharp from 'sharp';
 
 import { isAuthenticated } from '@/lib/auth';
 
@@ -15,20 +15,22 @@ export async function POST(request) {
     const data = await request.formData();
     const file = data.get('image');
 
-    if (!file) {
+    if (!file || typeof file === 'string') {
+      console.log('Upload error: No file found or file is a string');
       return NextResponse.json({ error: 'No image file found' }, { status: 400 });
     }
 
     // MIME type check
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
-    if (!allowedMimeTypes.includes(file.type)) {
+    if (!file.type || !file.type.startsWith('image/')) {
+      console.log('Upload error: Invalid file type:', file.type);
       return NextResponse.json({ error: 'Invalid file type. Only images are allowed.' }, { status: 400 });
     }
 
-    // Size limit check (5MB)
-    const MAX_SIZE = 5 * 1024 * 1024;
+    // Size limit check (20MB)
+    const MAX_SIZE = 20 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: 'File size exceeds 5MB limit.' }, { status: 400 });
+      console.log('Upload error: File too large:', file.size);
+      return NextResponse.json({ error: 'File size exceeds 20MB limit.' }, { status: 400 });
     }
 
     // 3. Save File
@@ -37,10 +39,17 @@ export async function POST(request) {
 
     // Create unique filename to prevent overwriting
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const filename = uniqueSuffix + '-' + file.name.replace(/[^a-zA-Z0-9.\-_]/g, '');
+    // Force webp extension for optimized image
+    const filename = uniqueSuffix + '.webp';
     const filepath = path.join(process.cwd(), 'public/uploads', filename);
 
-    await writeFile(filepath, buffer);
+    // Compress with sharp
+    const optimizedBuffer = await sharp(buffer)
+      .resize({ width: 1920, withoutEnlargement: true }) // Max width 1920px, keep aspect ratio
+      .webp({ quality: 80 })
+      .toBuffer();
+
+    await writeFile(filepath, optimizedBuffer);
 
     // Return the relative URL to the saved image
     const imageUrl = `/uploads/${filename}`;

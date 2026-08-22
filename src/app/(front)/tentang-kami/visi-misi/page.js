@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 
-export const revalidate = 0; // Disable cache for demo purposes
+export const revalidate = 60; // Disable cache for demo purposes
 
 export default async function Page() {
   const visimisi = await prisma.visiMisi.findFirst();
@@ -91,9 +91,10 @@ export default async function Page() {
                 width: '100%',
                 maxWidth: '350px'
               }}>
-                <img 
+                <Image className="zoomable-image" 
                   src={visimisi?.photoUrl || "/images/slide1.png"} 
                   alt="Sekolah" 
+                  width={400} height={400}
                   style={{ width: '100%', height: 'auto', display: 'block' }}
                 />
               </div>

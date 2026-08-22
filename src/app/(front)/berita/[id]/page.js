@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import Link from 'next/link';
 
-export const revalidate = 0; // Disable cache for demo purposes
+export const revalidate = 60; // Disable cache for demo purposes
 
 export default async function BeritaDetail({ params }) {
   const { id } = await params;
@@ -27,8 +28,7 @@ export default async function BeritaDetail({ params }) {
     second: '2-digit'
   });
 
-  // Split content into paragraphs
-  const paragraphs = post.content.split('\n').filter(p => p.trim() !== '');
+  // No longer splitting by newline, we expect HTML content from Quill
 
   return (
     <main style={{ paddingBottom: '0', background: '#fafafa' }}>
@@ -71,11 +71,20 @@ export default async function BeritaDetail({ params }) {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '50px' }}>
             
             {/* Text Content - Left */}
-            <div style={{ flex: '1', minWidth: '300px', color: '#475569', lineHeight: '1.8', fontSize: '1.05rem' }}>
-              {paragraphs.map((p, index) => (
-                <p key={index} style={{ marginBottom: '20px' }}>{p}</p>
-              ))}
-            </div>
+            <div 
+              className="rich-text-content"
+              style={{ flex: '1', minWidth: '300px', color: '#475569', lineHeight: '1.8', fontSize: '1.05rem' }}
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
+            
+            <style dangerouslySetInnerHTML={{__html: `
+              .rich-text-content p { margin-bottom: 20px; }
+              .rich-text-content h1, .rich-text-content h2, .rich-text-content h3 { color: #1e3a8a; margin-top: 30px; margin-bottom: 15px; }
+              .rich-text-content ul, .rich-text-content ol { margin-bottom: 20px; padding-left: 20px; }
+              .rich-text-content li { margin-bottom: 8px; }
+              .rich-text-content a { color: #2563eb; text-decoration: underline; }
+              .rich-text-content blockquote { border-left: 4px solid #cbd5e1; padding-left: 15px; font-style: italic; color: #64748b; margin-bottom: 20px; }
+            `}} />
 
             {/* Image Content - Right */}
             <div style={{ flex: '0 0 350px' }}>
@@ -85,9 +94,10 @@ export default async function BeritaDetail({ params }) {
                 background: 'white',
                 boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
               }}>
-                <img 
-                  src={post.imageUrl || "/images/slide1.png"} 
+                <Image className="zoomable-image" 
+                  src={post.imageUrl || '/images/slide1.png'} 
                   alt={post.title} 
+                  width={800} height={600}
                   style={{ width: '100%', height: 'auto', display: 'block', aspectRatio: '3/4', objectFit: 'cover' }}
                 />
               </div>

@@ -6,6 +6,21 @@ import { jwtVerify } from 'jose';
 import { unlink } from 'fs/promises';
 import path from 'path';
 
+export async function PUT(request, { params }) {
+  if (!await isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const { id } = await params;
+    const { title, category, studentName, level, imageUrl, description } = await request.json();
+    const updated = await prisma.achievement.update({
+      where: { id },
+      data: { title, category, studentName, level, imageUrl, description }
+    });
+    return NextResponse.json(updated);
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to update achievement' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request, { params }) {
   if (!await isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {

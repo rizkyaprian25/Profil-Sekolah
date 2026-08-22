@@ -62,3 +62,7 @@ generate-pages.js
 # Uploaded Media
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+PRD.md
+Struktur_Folder.md
+Panduan_Server_Sekolah.md

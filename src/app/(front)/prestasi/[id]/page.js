@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default async function AchievementDetail({ params }) {
   const resolvedParams = await params;
@@ -63,10 +64,11 @@ export default async function AchievementDetail({ params }) {
               background: 'white',
               padding: '10px'
             }}>
-              <img 
+              <Image className="zoomable-image" 
                 src={ach.imageUrl} 
                 alt={ach.title} 
-                style={{ width: '100%', height: 'auto', borderRadius: '8px', display: 'block' }}
+                width={800} height={600}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
               />
             </div>
           ) : (

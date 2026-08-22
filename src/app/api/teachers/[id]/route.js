@@ -6,6 +6,21 @@ import { cookies } from 'next/headers';
 import { unlink } from 'fs/promises';
 import path from 'path';
 
+export async function PUT(request, { params }) {
+  if (!await isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const { id } = await params;
+    const { name, subject, photoUrl, description, education, experience, additionalRole } = await request.json();
+    const updated = await prisma.teacher.update({
+      where: { id },
+      data: { name, subject, photoUrl, description, education, experience, additionalRole }
+    });
+    return NextResponse.json(updated);
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to update teacher' }, { status: 500 });
+  }
+}
+
 export async function DELETE(request, { params }) {
   if (!await isAuthenticated()) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 
-export const revalidate = 0; // Disable cache for demo purposes
+export const revalidate = 60; // Disable cache for demo purposes
 
 export default async function Page() {
   const sambutan = await prisma.sambutan.findFirst();
@@ -43,7 +43,7 @@ export default async function Page() {
               border: '8px solid #cccccc',
               boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
             }}>
-              <img 
+              <img className="zoomable-image" 
                 src={sambutan?.photoUrl || "/images/kepsek.png"} 
                 alt="Kepala Sekolah" 
                 style={{ width: '100%', height: 'auto', display: 'block' }}

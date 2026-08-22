@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function Page() {
   const saranaList = await prisma.sarana.findMany({
@@ -78,7 +78,7 @@ export default async function Page() {
                   {/* Kolom Kanan (Gambar) */}
                   <div style={{ textAlign: 'center' }}>
                     {item.photoUrl ? (
-                      <img 
+                      <img className="zoomable-image" 
                         src={item.photoUrl} 
                         alt={item.title} 
                         style={{ 

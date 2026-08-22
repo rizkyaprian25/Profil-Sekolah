@@ -1,12 +1,29 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import 'react-quill-new/dist/quill.snow.css';
+
+const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+
+const quillModules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'color': [] }, { 'background': [] }],
+    ['link'],
+    ['clean']
+  ],
+};
 
 export default function AdminPosts() {
   const [posts, setPosts] = useState([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [existingImageUrl, setExistingImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ message: '', type: '' });
 
@@ -34,7 +51,7 @@ export default function AdminPosts() {
     setLoading(true);
     
     try {
-      let imageUrl = '';
+      let finalImageUrl = existingImageUrl;
       
       // Upload image first if selected
       if (imageFile) {
@@ -48,7 +65,7 @@ export default function AdminPosts() {
         
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
-          imageUrl = uploadData.imageUrl;
+          finalImageUrl = uploadData.imageUrl;
         } else {
           showNotification('Gagal mengunggah gambar.', 'error');
           setLoading(false);
@@ -56,27 +73,57 @@ export default function AdminPosts() {
         }
       }
 
-      const res = await fetch('/api/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content, imageUrl })
-      });
+      const payload = { title, content, imageUrl: finalImageUrl };
+      let res;
+
+      if (editingId) {
+        res = await fetch(`/api/posts/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } else {
+        res = await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      }
       
       if (res.ok) {
         setTitle('');
         setContent('');
         setImageFile(null);
-        e.target.reset(); // Reset file input
-        showNotification('Berita berhasil ditambahkan!', 'success');
+        setEditingId(null);
+        setExistingImageUrl('');
+        if (e.target) e.target.reset(); // Reset file input
+        showNotification(editingId ? 'Berita berhasil diperbarui!' : 'Berita berhasil ditambahkan!', 'success');
         fetchPosts();
       } else {
-        showNotification('Gagal menambahkan berita (Unauthorized).', 'error');
+        showNotification('Gagal menyimpan berita (Unauthorized).', 'error');
       }
     } catch (err) {
       showNotification('Terjadi kesalahan jaringan.', 'error');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (post) => {
+    setTitle(post.title);
+    setContent(post.content);
+    setEditingId(post.id);
+    setExistingImageUrl(post.imageUrl || '');
+    setImageFile(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setTitle('');
+    setContent('');
+    setEditingId(null);
+    setExistingImageUrl('');
+    setImageFile(null);
   };
 
   const handleDelete = async (id) => {
@@ -118,7 +165,7 @@ export default function AdminPosts() {
         {/* Form Add Post */}
         <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', overflow: 'hidden', height: 'fit-content' }}>
           <div style={{ background: '#f8fafc', padding: '20px', borderBottom: '1px solid #e2e8f0' }}>
-            <h3 style={{ margin: 0, color: '#334155' }}>Tambah Berita Baru</h3>
+            <h3 style={{ margin: 0, color: '#334155' }}>{editingId ? 'Ubah Berita' : 'Tambah Berita Baru'}</h3>
           </div>
           <form onSubmit={handleSubmit} style={{ padding: '25px' }}>
             <div style={{ marginBottom: '20px' }}>
@@ -142,7 +189,7 @@ export default function AdminPosts() {
                 onChange={e => setImageFile(e.target.files[0])}
                 style={{ width: '100%', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
               />
-              {imageFile && (
+              {imageFile ? (
                 <div style={{ marginTop: '10px' }}>
                   <img 
                     src={URL.createObjectURL(imageFile)} 
@@ -150,28 +197,49 @@ export default function AdminPosts() {
                     style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }} 
                   />
                 </div>
-              )}
+              ) : existingImageUrl ? (
+                <div style={{ marginTop: '10px' }}>
+                  <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '5px' }}>Gambar Saat Ini:</p>
+                  <img 
+                    src={existingImageUrl} 
+                    alt="Current" 
+                    style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }} 
+                  />
+                </div>
+              ) : null}
             </div>
             <div style={{ marginBottom: '25px' }}>
               <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Isi Berita</label>
-              <textarea 
+              <ReactQuill 
+                theme="snow"
                 value={content} 
-                onChange={e => setContent(e.target.value)} 
-                required 
-                rows="8"
+                onChange={setContent}
+                modules={quillModules}
                 placeholder="Tulis detail berita atau pengumuman di sini..."
-                style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none', resize: 'vertical' }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                style={{ background: 'white', borderRadius: '6px' }}
               />
             </div>
-            <button type="submit" disabled={loading} style={{ 
-              width: '100%', background: '#3b82f6', color: 'white', padding: '12px', border: 'none', 
-              borderRadius: '6px', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '1rem',
-              transition: 'background 0.2s'
-            }}>
-              {loading ? 'Menyimpan...' : 'Publikasikan Berita'}
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button type="submit" disabled={loading} style={{ 
+                flex: 1, background: '#3b82f6', color: 'white', padding: '12px', border: 'none', 
+                borderRadius: '6px', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '1rem',
+                transition: 'background 0.2s'
+              }}>
+                {loading ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Publikasikan Berita')}
+              </button>
+              {editingId && (
+                <button 
+                  type="button" 
+                  onClick={handleCancelEdit} 
+                  style={{ 
+                    background: '#ef4444', color: 'white', padding: '12px 20px', border: 'none', 
+                    borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem'
+                  }}
+                >
+                  Batal
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
@@ -204,24 +272,38 @@ export default function AdminPosts() {
                             <img src={post.imageUrl} alt={post.title} style={{ width: '100px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} />
                           </div>
                         )}
-                        <p style={{ margin: '0 0 10px 0', color: '#64748b', fontSize: '0.9rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                          {post.content}
-                        </p>
+                        <div 
+                          style={{ margin: '0 0 10px 0', color: '#64748b', fontSize: '0.9rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                          dangerouslySetInnerHTML={{ __html: post.content }}
+                        />
                         <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.8rem' }}>
                           📅 {new Date(post.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
                       </div>
-                      <button 
-                        onClick={() => handleDelete(post.id)} 
-                        style={{ 
-                          background: '#fee2e2', color: '#ef4444', padding: '8px 12px', border: '1px solid #fecaca', 
-                          borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s', flexShrink: 0
-                        }}
-                        onMouseOver={(e) => { e.target.style.background = '#ef4444'; e.target.style.color = 'white'; }}
-                        onMouseOut={(e) => { e.target.style.background = '#fee2e2'; e.target.style.color = '#ef4444'; }}
-                      >
-                        Hapus
-                      </button>
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <button 
+                          onClick={() => handleEdit(post)} 
+                          style={{ 
+                            background: '#fef08a', color: '#a16207', padding: '8px 12px', border: '1px solid #fde047', 
+                            borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s', flexShrink: 0
+                          }}
+                          onMouseOver={(e) => { e.target.style.background = '#eab308'; e.target.style.color = 'white'; }}
+                          onMouseOut={(e) => { e.target.style.background = '#fef08a'; e.target.style.color = '#a16207'; }}
+                        >
+                          Ubah
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(post.id)} 
+                          style={{ 
+                            background: '#fee2e2', color: '#ef4444', padding: '8px 12px', border: '1px solid #fecaca', 
+                            borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold', transition: 'all 0.2s', flexShrink: 0
+                          }}
+                          onMouseOver={(e) => { e.target.style.background = '#ef4444'; e.target.style.color = 'white'; }}
+                          onMouseOut={(e) => { e.target.style.background = '#fee2e2'; e.target.style.color = '#ef4444'; }}
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </div>
                   </li>
                 ))}

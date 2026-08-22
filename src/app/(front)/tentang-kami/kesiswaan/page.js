@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
-export const revalidate = 0; // Disable cache for demo purposes
+export const revalidate = 60; // Disable cache for demo purposes
 
 export default async function Page() {
   const kesiswaan = await prisma.kesiswaan.findFirst();
@@ -68,7 +68,7 @@ export default async function Page() {
             <div style={{ textAlign: 'center' }}>
               {kesiswaan?.photoUrl ? (
                 <div style={{ background: '#f8f9fa', padding: '15px', display: 'inline-block', width: '100%' }}>
-                  <img 
+                  <img className="zoomable-image" 
                     src={kesiswaan.photoUrl} 
                     alt="Kesiswaan" 
                     style={{ 

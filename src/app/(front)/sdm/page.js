@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import Image from 'next/image';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function Page() {
   const teachers = await prisma.teacher.findMany();
@@ -70,7 +71,7 @@ export default async function Page() {
           ) : (
             teachers.map((teacher) => (
               <Link href={`/sdm/lihat/${teacher.id}/detail`} className="guru-card" key={teacher.id}>
-                <img src={teacher.photoUrl || '/images/guru1.png'} alt={teacher.name} className="guru-image" />
+                <Image src={teacher.photoUrl || '/images/guru1.png'} alt={teacher.name} className="guru-image zoomable-image" width={300} height={300} />
                 <div className="guru-name-tag">
                   {teacher.name}
                 </div>

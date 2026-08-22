@@ -10,12 +10,29 @@ Website ini dikembangkan untuk menjadi portal informasi digital resmi bagi SMPN 
 - **Transparansi Sekolah**: Menampilkan data Sumber Daya Manusia (guru dan pegawai) secara rapi, elegan, dan profesional.
 - **Portal Berita & Publikasi**: Memiliki sistem CMS (Content Management System) internal yang mempermudah admin sekolah untuk memperbarui hampir seluruh data website secara dinamis (seperti Sejarah, Visi Misi, Berita, dll).
 
-## 3. Arsitektur & Teknologi
-- **Framework Frontend/Backend:** Next.js (App Router dengan Turbopack)
-- **Styling:** Vanilla CSS (`global.css`) tanpa framework eksternal. Menggunakan pendekatan desain **Soft UI** (bayangan halus, sudut melengkung, efek transisi dinamis).
-- **Database ORM:** Prisma
-- **Database Engine:** SQLite (`dev.db`, berbasis *file* untuk kemudahan pengembangan/deployment awal)
-- **Autentikasi:** Custom JWT/Session based (untuk perlindungan akses Admin Panel)
+## 3. Arsitektur & Teknologi (Tech Stack)
+
+### 3.1. Teknologi Inti (Pondasi)
+- **Next.js (App Router dengan Turbopack):** Framework tingkat lanjut dari React yang bertindak sebagai mesin utama web ini. Berfungsi untuk menyatukan tampilan depan (Frontend) dan sistem belakang (Backend/API) menjadi satu kesatuan berkecepatan tinggi berkat fitur *pre-rendering*.
+- **React.js:** Library antarmuka yang memungkinkan interaksi website (UI) berjalan mulus tanpa perlu *reload* halaman.
+
+### 3.2. Desain & Tampilan (Frontend)
+- **Vanilla CSS (`global.css`):** Menggunakan murni CSS tanpa mengandalkan framework eksternal besar. 
+  - **Fungsi:** Membuat *loading* website menjadi ekstra kilat dan memungkinkan kebebasan mendesain tema eksklusif bergaya **Premium Soft UI** (bayangan halus, sudut melengkung, hover interaktif).
+
+### 3.3. Basis Data (Database)
+- **SQLite:** Sistem basis data tunggal (`dev.db`) yang berbasis file lokal. 
+  - **Fungsi:** Menyimpan seluruh data teks dengan struktur yang sangat sederhana untuk dipindahkan (backup), tanpa memerlukan instalasi server database mandiri. Sangat cocok dan hemat biaya untuk lingkungan sekolah.
+- **Prisma ORM:** Jembatan komunikasi antara Next.js dan SQLite.
+  - **Fungsi:** Memudahkan manipulasi data menggunakan kode JavaScript modern yang bersih, sekaligus menjamin keamanan ketat anti-SQL Injection.
+
+### 3.4. Keamanan & Autentikasi
+- **Bcrypt.js:** Teknologi enkripsi *hashing* searah.
+  - **Fungsi:** Merubah kata sandi asli administrator menjadi kode rahasia acak di dalam database agar tidak dapat diretas.
+- **Jose (JSON Web Tokens):** Sistem manajemen sesi berbasis JWT *cookies*.
+  - **Fungsi:** Menciptakan tiket keamanan (*session*) yang memverifikasi pengakses panel `/admin`. Sistem ini memproteksi rute sensitif dan menolak akses (*unauthorized*) otomatis bagi penyusup.
+- **Node FS (File System):** Modul penyimpanan bawaan untuk *upload* gambar.
+  - **Fungsi:** Mengelola manajemen file *upload* ke folder `public/uploads`, menerapkan filter batasan ukuran maksimal (5MB), serta menghapus foto fisik secara otomatis dari folder jika ada pembaruan atau penghapusan data.
 
 ## 4. Fitur Utama
 

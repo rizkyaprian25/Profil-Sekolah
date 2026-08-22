@@ -8,6 +8,7 @@ export async function POST() {
     value: '',
     httpOnly: true,
     path: '/',
+    sameSite: 'lax',
     expires: new Date(0) // Expire immediately
   });
 

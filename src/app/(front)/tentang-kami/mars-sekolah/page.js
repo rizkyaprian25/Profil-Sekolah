@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 
-export const revalidate = 0; // Disable cache for demo purposes
+export const revalidate = 60; // Disable cache for demo purposes
 
 export default async function Page() {
   const mars = await prisma.mars.findFirst();
@@ -60,13 +60,31 @@ export default async function Page() {
               </h2>
               
               <div className="video-container">
-                <iframe 
-                  src={mars?.videoUrl || "https://www.youtube.com/embed/2LhVa_2f_2Q?si=M_7BdcuuTaulaO9T"} 
-                  title="YouTube video player" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                  referrerPolicy="strict-origin-when-cross-origin" 
-                  allowFullScreen
-                ></iframe>
+                {(() => {
+                  let videoUrl = mars?.videoUrl || "https://www.youtube.com/embed/2LhVa_2f_2Q?si=M_7BdcuuTaulaO9T";
+                  try {
+                    if (videoUrl.includes("youtube.com/watch")) {
+                      const urlParams = new URLSearchParams(new URL(videoUrl).search);
+                      const v = urlParams.get("v");
+                      if (v) videoUrl = `https://www.youtube.com/embed/${v}`;
+                    } else if (videoUrl.includes("youtu.be/")) {
+                      const id = videoUrl.split("youtu.be/")[1].split("?")[0];
+                      if (id) videoUrl = `https://www.youtube.com/embed/${id}`;
+                    }
+                  } catch (e) {
+                    // ignore URL parsing errors and fallback to original
+                  }
+                  
+                  return (
+                    <iframe 
+                      src={videoUrl} 
+                      title="YouTube video player" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                      referrerPolicy="strict-origin-when-cross-origin" 
+                      allowFullScreen
+                    ></iframe>
+                  );
+                })()}
               </div>
 
               {mars?.content && (
@@ -87,7 +105,7 @@ export default async function Page() {
                 width: '100%',
                 maxWidth: '350px'
               }}>
-                <img 
+                <img className="zoomable-image" 
                   src={mars?.photoUrl || "/images/slide1.png"} 
                   alt="Sekolah" 
                   style={{ width: '100%', height: 'auto', display: 'block' }}

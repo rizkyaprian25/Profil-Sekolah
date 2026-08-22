@@ -64,7 +64,10 @@ export default function NewsSlider({ posts }) {
                 {post.title}
               </h3>
               <p style={{ color: '#64748b', fontSize: '0.9rem', lineHeight: '1.6' }}>
-                {post.content.length > 150 ? post.content.substring(0, 150) + '...' : post.content}
+                {(() => {
+                  const plainText = post.content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
+                  return plainText.length > 150 ? plainText.substring(0, 150) + '...' : plainText;
+                })()}
               </p>
             </div>
             

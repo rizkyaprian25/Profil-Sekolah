@@ -1,14 +1,24 @@
 import Link from 'next/link';
+import GlobalLightbox from '@/components/GlobalLightbox';
 
 export default function FrontLayout({ children }) {
   return (
     <>
+      <GlobalLightbox />
       <nav className="navbar">
         <div className="container nav-container">
-          <Link href="/" className="nav-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: 'inherit' }}>
+          <Link href="/" className="nav-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: 'inherit', zIndex: 1001 }}>
             <img src="/images/Logo.png" alt="Logo SMPN 3 Cibungbulang" style={{ height: '40px', width: 'auto' }} />
             <h2 style={{ margin: 0, fontSize: 'inherit', color: 'inherit' }}>SMPN 3 Cibungbulang</h2>
           </Link>
+          
+          <input type="checkbox" id="nav-toggle" className="nav-toggle" />
+          <label htmlFor="nav-toggle" className="nav-toggle-label">
+            <span></span>
+            <span></span>
+            <span></span>
+          </label>
+
           <ul className="nav-menu">
             <li className="nav-item"><a href="/" className="nav-link">Home</a></li>
             
@@ -21,7 +31,7 @@ export default function FrontLayout({ children }) {
                 <li><a href="/tentang-kami/visi-misi" className="dropdown-item">Visi Misi Sekolah</a></li>
                 <li><a href="/tentang-kami/mars-sekolah" className="dropdown-item">Mars Sekolah</a></li>
                 <li><a href="/tentang-kami/kepala-sekolah" className="dropdown-item">Kepala Sekolah</a></li>
-                <li><a href="/tentang-kami/komite-sekolah" className="dropdown-item">Komite Sekolah</a></li>
+
                 <li><a href="/tentang-kami/kurikulum" className="dropdown-item">Kurikulum</a></li>
                 <li><a href="/tentang-kami/kesiswaan" className="dropdown-item">Kesiswaan</a></li>
                 <li><a href="/tentang-kami/sarana-prasarana" className="dropdown-item">Sarana dan Prasarana</a></li>

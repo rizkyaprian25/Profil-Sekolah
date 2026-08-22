@@ -11,6 +11,8 @@ export default function AdminTeachers() {
   const [experience, setExperience] = useState('');
   const [additionalRole, setAdditionalRole] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [existingImageUrl, setExistingImageUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ message: '', type: '' });
 
@@ -65,7 +67,7 @@ export default function AdminTeachers() {
 
     setLoading(true);
     try {
-      let finalImageUrl = '/images/guru1.png'; // default fallback
+      let finalImageUrl = existingImageUrl || '/images/guru1.png'; // default fallback if no existing image
       
       // Upload image first if selected
       if (imageFile) {
@@ -87,11 +89,22 @@ export default function AdminTeachers() {
         }
       }
       
-      const res = await fetch('/api/teachers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, subject, photoUrl: finalImageUrl, description, education, experience, additionalRole })
-      });
+      const payload = { name, subject, photoUrl: finalImageUrl, description, education, experience, additionalRole };
+      let res;
+
+      if (editingId) {
+        res = await fetch(`/api/teachers/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      } else {
+        res = await fetch('/api/teachers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+      }
       
       if (res.ok) {
         setName('');
@@ -101,8 +114,10 @@ export default function AdminTeachers() {
         setExperience('');
         setAdditionalRole('');
         setImageFile(null);
-        e.target.reset(); // Reset file input
-        showNotification('Data Guru berhasil ditambahkan!', 'success');
+        setEditingId(null);
+        setExistingImageUrl('');
+        if (e.target) e.target.reset(); // Reset file input
+        showNotification(editingId ? 'Data Guru berhasil diperbarui!' : 'Data Guru berhasil ditambahkan!', 'success');
         fetchTeachers();
       } else {
         throw new Error('Gagal menyimpan data');
@@ -112,6 +127,31 @@ export default function AdminTeachers() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (t) => {
+    setName(t.name);
+    setSubject(t.subject || 'Guru Kelas');
+    setDescription(t.description || '');
+    setEducation(t.education || '');
+    setExperience(t.experience || '');
+    setAdditionalRole(t.additionalRole || '');
+    setEditingId(t.id);
+    setExistingImageUrl(t.photoUrl || '');
+    setImageFile(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setName('');
+    setSubject('Guru Kelas');
+    setDescription('');
+    setEducation('');
+    setExperience('');
+    setAdditionalRole('');
+    setEditingId(null);
+    setExistingImageUrl('');
+    setImageFile(null);
   };
 
   const handleDelete = async (id) => {
@@ -149,7 +189,7 @@ export default function AdminTeachers() {
         
         {/* Form Tambah */}
         <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', alignSelf: 'start' }}>
-          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginBottom: '25px', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>Tambah Guru Baru</h2>
+          <h2 style={{ fontSize: '1.2rem', color: '#1e293b', marginBottom: '25px', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>{editingId ? 'Ubah Data Guru' : 'Tambah Guru Baru'}</h2>
           
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: '20px' }}>
@@ -226,25 +266,44 @@ export default function AdminTeachers() {
                 onChange={e => setImageFile(e.target.files[0])}
                 style={{ width: '100%', padding: '10px', border: '1px dashed #94a3b8', borderRadius: '6px', background: '#f8fafc' }}
               />
-              <small style={{ color: '#64748b', display: 'block', marginTop: '5px' }}>*Jika tidak diisi, akan menggunakan gambar default.</small>
-              {imageFile && (
+              <small style={{ color: '#64748b', display: 'block', marginTop: '5px' }}>*Jika tidak diisi, akan menggunakan gambar default atau yang lama.</small>
+              {imageFile ? (
                 <div style={{ marginTop: '10px' }}>
                   <img src={URL.createObjectURL(imageFile)} alt="Preview" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }} />
                 </div>
-              )}
+              ) : existingImageUrl ? (
+                <div style={{ marginTop: '10px' }}>
+                  <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '5px' }}>Gambar Saat Ini:</p>
+                  <img src={existingImageUrl} alt="Current" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }} />
+                </div>
+              ) : null}
             </div>
 
-            <button 
-              type="submit" 
-              disabled={loading}
-              style={{ 
-                width: '100%', padding: '12px', background: loading ? '#94a3b8' : '#2563eb', color: 'white', 
-                border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'background 0.2s'
-              }}
-            >
-              {loading ? 'Menyimpan...' : 'Simpan Data Guru'}
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button 
+                type="submit" 
+                disabled={loading}
+                style={{ 
+                  flex: 1, padding: '12px', background: loading ? '#94a3b8' : '#2563eb', color: 'white', 
+                  border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer',
+                  transition: 'background 0.2s'
+                }}
+              >
+                {loading ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Simpan Data Guru')}
+              </button>
+              {editingId && (
+                <button 
+                  type="button" 
+                  onClick={handleCancelEdit} 
+                  style={{ 
+                    background: '#ef4444', color: 'white', padding: '12px 20px', border: 'none', 
+                    borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem'
+                  }}
+                >
+                  Batal
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
@@ -270,14 +329,24 @@ export default function AdminTeachers() {
                     <h4 style={{ margin: '0 0 4px 0', color: '#0f172a', fontSize: '1.05rem' }}>{t.name}</h4>
                     <p style={{ margin: 0, color: '#64748b', fontSize: '0.85rem' }}>{t.subject}</p>
                   </div>
-                  <button 
-                    onClick={() => handleDelete(t.id)}
-                    style={{ background: '#fee2e2', color: '#ef4444', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold' }}
-                    onMouseOver={e => { e.target.style.background = '#fecaca'; }}
-                    onMouseOut={e => { e.target.style.background = '#fee2e2'; }}
-                  >
-                    Hapus
-                  </button>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button 
+                      onClick={() => handleEdit(t)}
+                      style={{ background: '#fef08a', color: '#a16207', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold' }}
+                      onMouseOver={e => { e.target.style.background = '#eab308'; e.target.style.color = 'white'; }}
+                      onMouseOut={e => { e.target.style.background = '#fef08a'; e.target.style.color = '#a16207'; }}
+                    >
+                      Ubah
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(t.id)}
+                      style={{ background: '#fee2e2', color: '#ef4444', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 'bold' }}
+                      onMouseOver={e => { e.target.style.background = '#fecaca'; }}
+                      onMouseOut={e => { e.target.style.background = '#fee2e2'; }}
+                    >
+                      Hapus
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

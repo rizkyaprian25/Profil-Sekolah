@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -12,7 +13,7 @@ export default async function Page() {
     <main style={{ backgroundColor: '#f9f9f9', minHeight: '100vh', paddingBottom: '80px' }}>
       {/* Jumbotron/Header Style */}
       <div style={{
-        background: 'linear-gradient(rgba(0, 0, 0, .2), rgba(0, 0, 0, .2)), url(/images/hero-bg.png) center center no-repeat',
+        background: 'linear-gradient(rgba(0, 0, 0, .2), rgba(0, 0, 0, .2)), url(/images/slide1.png) center center no-repeat',
         backgroundSize: 'cover',
         height: '270px',
         display: 'flex',
@@ -55,7 +56,7 @@ export default async function Page() {
                   marginBottom: '30px',
                   textAlign: 'justify'
                 }}>
-                  {ekskul.description}
+                  {ekskul.description.length > 150 ? ekskul.description.substring(0, 150) + '...' : ekskul.description}
                 </p>
                 
                 <div style={{ 
@@ -65,7 +66,7 @@ export default async function Page() {
                   flexWrap: 'wrap',
                   gap: '20px'
                 }}>
-                  <Link href={`#`} style={{
+                  <Link href={`/ekskul/${ekskul.id}`} style={{
                     display: 'inline-block',
                     backgroundColor: '#1E90FF', // Blue color from reference
                     color: '#fff',
@@ -97,9 +98,11 @@ export default async function Page() {
                   backgroundColor: '#fff',
                   padding: '4px' // Inner spacing like a frame
                 }}>
-                  <img 
-                    src={ekskul.photoUrl || '/images/hero-bg.png'} 
+                  <Image className="zoomable-image" 
+                    src={ekskul.photoUrl || '/images/slide1.png'} 
                     alt={ekskul.title} 
+                    width={500} 
+                    height={300}
                     style={{ 
                       width: '100%', 
                       height: '300px', 

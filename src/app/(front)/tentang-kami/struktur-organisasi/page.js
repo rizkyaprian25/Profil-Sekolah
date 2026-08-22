@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import ImageModal from '@/components/ImageModal';
 
-export const revalidate = 0; // Disable cache for demo purposes
+export const revalidate = 60; // Disable cache for demo purposes
 
 export default async function Page() {
   const struktur = await prisma.strukturOrganisasi.findFirst();
@@ -58,10 +59,10 @@ export default async function Page() {
             <div style={{ textAlign: 'center' }}>
               {struktur?.photoUrl ? (
                 <div style={{ padding: '15px', display: 'inline-block', width: '100%' }}>
-                  <img 
+                  <ImageModal 
                     src={struktur.photoUrl} 
                     alt="Struktur Organisasi" 
-                    style={{ 
+                    imageStyle={{ 
                       width: '100%', 
                       height: 'auto',
                       minHeight: '300px',

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function Page() {
   const teachers = await prisma.teacher.findMany();
@@ -54,34 +54,6 @@ export default async function Page() {
           .page-header-sdm {height:120px;}   
         }
 
-        .guru-card {
-          display: block;
-          text-decoration: none;
-          color: inherit;
-          transition: transform 0.3s;
-        }
-        .guru-card:hover {
-          transform: translateY(-5px);
-        }
-        .guru-image {
-          width: 100%;
-          height: 350px;
-          object-fit: cover;
-          border-radius: 12px 12px 0 0;
-        }
-        .guru-name-tag {
-          background-color: #1E90FF;
-          color: white;
-          text-align: center;
-          padding: 15px;
-          font-size: 1.1rem;
-          font-weight: bold;
-          border-radius: 0 0 12px 12px;
-          transition: background-color 0.3s;
-        }
-        .guru-card:hover .guru-name-tag {
-          background-color: orange;
-        }
       `}} />
 
       <div className="page-header-sdm">
@@ -98,7 +70,7 @@ export default async function Page() {
           ) : (
             teachers.map((teacher) => (
               <Link href={`/tentang-kami/sumber-daya-manusia/baca/${teacher.id}`} className="guru-card" key={teacher.id}>
-                <img src={teacher.photoUrl || '/images/guru1.png'} alt={teacher.name} className="guru-image" />
+                <img src={teacher.photoUrl || '/images/guru1.png'} alt={teacher.name} className="guru-image zoomable-image" />
                 <div className="guru-name-tag">
                   {teacher.name}
                 </div>

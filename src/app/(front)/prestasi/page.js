@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import Image from 'next/image';
 import ScrollAnimation from '@/components/ScrollAnimation';
 
-export const revalidate = 0; // Disable cache for demo purposes
+export const revalidate = 60; // Disable cache for demo purposes
 
 export default async function Page() {
   const achievements = await prisma.achievement.findMany({
@@ -31,7 +32,7 @@ export default async function Page() {
               <ScrollAnimation animation="fade-up" delay={(index % 4) * 150} key={ach.id}>
                 <Link href={`/prestasi/${ach.id}`} className="prestasi-card" style={{ height: '100%' }}>
                   <div className="prestasi-image-wrapper" style={{ borderBottomColor: borderColors[index % borderColors.length] }}>
-                    <img src={ach.imageUrl || '/images/prestasi1.png'} alt={ach.title} />
+                    <Image className="zoomable-image" src={ach.imageUrl || '/images/prestasi1.png'} alt={ach.title} width={400} height={300} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                   <h3 className="prestasi-title">{ach.title}</h3>
                   <table className="prestasi-meta-table">

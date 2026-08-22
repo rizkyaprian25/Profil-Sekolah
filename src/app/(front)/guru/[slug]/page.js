@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 
-export const revalidate = 0; // Disable cache for demo purposes
+export const revalidate = 60; // Disable cache for demo purposes
 
 export default async function GuruDetail({ params }) {
   const resolvedParams = await params;
@@ -29,10 +30,11 @@ export default async function GuruDetail({ params }) {
       <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', gap: '40px', background: 'white', padding: '40px', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)' }}>
         
         <div style={{ flex: '0 0 300px' }}>
-          <img 
+          <Image 
             src={teacher.photoUrl || "/images/guru1.png"} 
             alt={teacher.name} 
-            style={{ width: '100%', borderRadius: '12px', objectFit: 'cover', objectPosition: 'top', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
+            width={400} height={400}
+            style={{ width: '100%', height: 'auto', borderRadius: '12px', objectFit: 'cover', objectPosition: 'top', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}
           />
         </div>
         

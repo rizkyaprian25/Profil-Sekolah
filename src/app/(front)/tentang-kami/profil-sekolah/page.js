@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
-export const revalidate = 0; // Disable cache for demo purposes
+export const revalidate = 60; // Disable cache for demo purposes
 
 export default async function Page() {
   const profil = await prisma.profil.findFirst();

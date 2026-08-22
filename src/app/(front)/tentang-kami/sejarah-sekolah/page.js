@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
+import Image from 'next/image';
 
-export const revalidate = 0; // Disable cache for demo purposes
+export const revalidate = 60; // Disable cache for demo purposes
 
 export default async function Page() {
   const sejarah = await prisma.sejarah.findFirst();
@@ -9,9 +10,9 @@ export default async function Page() {
   return (
     <main style={{ paddingBottom: '0', background: '#f8f9fa' }}>
       {/* Banner / Hero Section */}
-      <section style={{ 
-        position: 'relative', 
-        height: '250px', 
+      <section style={{
+        position: 'relative',
+        height: '250px',
         background: 'linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)), url("/images/slide1.png") center/cover',
         display: 'flex',
         alignItems: 'center',
@@ -31,10 +32,11 @@ export default async function Page() {
           <h2 style={{ fontSize: '2.5rem', color: '#0f172a', marginBottom: '40px', fontWeight: '400' }}>
             {sejarah?.title || 'Sejarah Sekolah'}
           </h2>
-          
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '40px' }} className="sejarah-grid">
             {/* Responsiveness */}
-            <style dangerouslySetInnerHTML={{__html: `
+            <style dangerouslySetInnerHTML={{
+              __html: `
               @media (min-width: 992px) {
                 .sejarah-grid { grid-template-columns: 2fr 1fr !important; }
               }
@@ -62,14 +64,15 @@ export default async function Page() {
                 border: '5px solid #cbd5e1',
                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
               }}>
-                <img 
-                  src={sejarah?.photoUrl || "/images/slide1.png"} 
-                  alt="Sejarah Sekolah" 
+                <Image className="zoomable-image"
+                  src={sejarah?.photoUrl || "/images/slide1.png"}
+                  alt="Sejarah Sekolah"
+                  width={400} height={400}
                   style={{ width: '100%', maxWidth: '400px', height: 'auto', display: 'block' }}
                 />
               </div>
             </div>
-            
+
           </div>
         </div>
       </section>

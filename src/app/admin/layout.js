@@ -10,7 +10,7 @@ export default function AdminLayout({ children }) {
   const isContentActive = ['/admin/posts', '/admin/achievements', '/admin/teachers', '/admin/sliders', '/admin/sambutan', '/admin/ekskul'].includes(pathname);
   const [isContentMenuOpen, setIsContentMenuOpen] = useState(isContentActive);
 
-  const isTentangKamiActive = ['/admin/sejarah', '/admin/profil', '/admin/visi-misi', '/admin/mars', '/admin/kepala-sekolah', '/admin/komite', '/admin/kurikulum', '/admin/kesiswaan', '/admin/sarana', '/admin/struktur-organisasi'].includes(pathname);
+  const isTentangKamiActive = ['/admin/sejarah', '/admin/profil', '/admin/visi-misi', '/admin/mars', '/admin/kepala-sekolah', '/admin/kurikulum', '/admin/kesiswaan', '/admin/sarana', '/admin/struktur-organisasi'].includes(pathname);
   const [isTentangKamiMenuOpen, setIsTentangKamiMenuOpen] = useState(isTentangKamiActive);
 
   // If we are on the login page, don't show the sidebar
@@ -208,16 +208,7 @@ export default function AdminLayout({ children }) {
                       Kelola Kepala Sekolah
                     </a>
                   </li>
-                  <li>
-                    <a href="/admin/komite" style={{ 
-                      display: 'block', padding: '10px 15px 10px 30px', color: pathname === '/admin/komite' ? 'white' : '#94a3b8',
-                      textDecoration: 'none', transition: 'all 0.2s', fontSize: '0.9rem',
-                      fontWeight: pathname === '/admin/komite' ? 'bold' : 'normal',
-                      background: pathname === '/admin/komite' ? '#1e293b' : 'transparent'
-                    }}>
-                      Kelola Komite Sekolah
-                    </a>
-                  </li>
+
                   <li>
                     <a href="/admin/kurikulum" style={{ 
                       display: 'block', padding: '10px 15px 10px 30px', color: pathname === '/admin/kurikulum' ? 'white' : '#94a3b8',
