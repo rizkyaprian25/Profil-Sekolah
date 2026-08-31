@@ -74,17 +74,9 @@ export default async function BeritaDetail({ params }) {
             <div 
               className="rich-text-content"
               style={{ flex: '1', minWidth: '300px', color: '#475569', lineHeight: '1.8', fontSize: '1.05rem' }}
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: post.content ? post.content.replace(/&nbsp;|\u00A0/g, ' ') : '' }}
             />
-            
-            <style dangerouslySetInnerHTML={{__html: `
-              .rich-text-content p { margin-bottom: 20px; }
-              .rich-text-content h1, .rich-text-content h2, .rich-text-content h3 { color: #1e3a8a; margin-top: 30px; margin-bottom: 15px; }
-              .rich-text-content ul, .rich-text-content ol { margin-bottom: 20px; padding-left: 20px; }
-              .rich-text-content li { margin-bottom: 8px; }
-              .rich-text-content a { color: #2563eb; text-decoration: underline; }
-              .rich-text-content blockquote { border-left: 4px solid #cbd5e1; padding-left: 15px; font-style: italic; color: #64748b; margin-bottom: 20px; }
-            `}} />
+
 
             {/* Image Content - Right */}
             <div style={{ flex: '0 0 350px' }}>

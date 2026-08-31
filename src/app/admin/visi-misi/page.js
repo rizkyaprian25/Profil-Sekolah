@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import RichTextEditor from "@/components/RichTextEditor";
 import Image from "next/image";
+import Toast from "@/components/Toast";
 
 export default function VisiMisiAdmin() {
   const [form, setForm] = useState({ 
@@ -10,7 +12,13 @@ export default function VisiMisiAdmin() {
   });
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState({ message: '', type: '' });
   const fileInputRef = useRef(null);
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: '', type: '' }), 3500);
+  };
 
   const fetchVisiMisi = async () => {
     setLoading(true);
@@ -59,7 +67,7 @@ export default function VisiMisiAdmin() {
           const uploadData = await uploadRes.json();
           finalImageUrl = uploadData.imageUrl;
         } else {
-          alert("Gagal mengunggah gambar.");
+          showNotification("Gagal mengunggah gambar.", "error");
           setLoading(false);
           return;
         }
@@ -75,10 +83,10 @@ export default function VisiMisiAdmin() {
 
       if (!res.ok) {
         if (res.status === 401) {
-          alert("Sesi Anda telah habis, silakan login kembali.");
-          window.location.href = "/admin/login";
+          showNotification("Sesi Anda telah habis, silakan login kembali.", "error");
+          setTimeout(() => { window.location.href = "/admin/login"; }, 1500);
         } else {
-          alert("Gagal menyimpan data.");
+          showNotification("Gagal menyimpan data.", "error");
         }
         setLoading(false);
         return;
@@ -86,11 +94,11 @@ export default function VisiMisiAdmin() {
       
       setImageFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      alert("Visi & Misi berhasil disimpan!");
+      showNotification("Visi & Misi berhasil disimpan!", "success");
       fetchVisiMisi();
     } catch (error) {
       console.error("Error saving visi-misi:", error);
-      alert("Terjadi kesalahan saat menyimpan data.");
+      showNotification("Terjadi kesalahan saat menyimpan data.", "error");
     } finally {
       setLoading(false);
     }
@@ -98,6 +106,7 @@ export default function VisiMisiAdmin() {
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <h2 style={{ fontSize: "2rem", marginBottom: "20px", color: "#1e293b" }}>Kelola Visi & Misi</h2>
 
       <div style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.05)", marginBottom: "30px" }}>
@@ -142,13 +151,10 @@ export default function VisiMisiAdmin() {
               <label style={{ display: "block", marginBottom: "5px", color: "#475569", fontWeight: "bold" }}>
                 Visi Sekolah
               </label>
-              <textarea 
-                name="visi" 
+              <RichTextEditor
                 value={form.visi} 
-                onChange={handleChange} 
-                rows="4"
-                style={{ width: "100%", padding: "10px", border: "1px solid #cbd5e1", borderRadius: "4px" }} 
-                required 
+                onChange={(val) => setForm({ ...form, visi: val })} 
+                style={{ height: '200px', marginBottom: '40px', background: 'white' }} 
               />
               <small style={{ color: "#64748b" }}>Tuliskan visi sekolah dalam bentuk paragraf.</small>
             </div>
@@ -157,13 +163,10 @@ export default function VisiMisiAdmin() {
               <label style={{ display: "block", marginBottom: "5px", color: "#475569", fontWeight: "bold" }}>
                 Misi Sekolah
               </label>
-              <textarea 
-                name="misi" 
+              <RichTextEditor
                 value={form.misi} 
-                onChange={handleChange} 
-                rows="8"
-                style={{ width: "100%", padding: "10px", border: "1px solid #cbd5e1", borderRadius: "4px" }} 
-                required 
+                onChange={(val) => setForm({ ...form, misi: val })} 
+                style={{ height: '200px', marginBottom: '40px', background: 'white' }} 
               />
               <small style={{ color: "#64748b", display: "block", marginTop: "5px" }}>
                 Pisahkan setiap poin misi dengan menekan tombol <strong>Enter (Baris Baru)</strong>. Sistem akan otomatis mengubahnya menjadi daftar bernomor 1, 2, 3 di halaman publik.

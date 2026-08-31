@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
-import ImageModal from '@/components/ImageModal';
 
 export const revalidate = 60; // Disable cache for demo purposes
 
@@ -46,9 +45,7 @@ export default async function Page() {
 
               <div style={{ color: '#64748b', lineHeight: '1.8', fontSize: '1.05rem', textAlign: 'justify' }}>
                 {struktur?.content ? (
-                  struktur.content.split('\n').filter(p => p.trim() !== '').map((paragraph, idx) => (
-                    <p key={idx} style={{ marginBottom: '15px' }}>{paragraph}</p>
-                  ))
+                  <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: struktur.content ? struktur.content.replace(/&nbsp;|\u00A0/g, ' ') : '' }} />
                 ) : (
                   <p></p> // Empty block as seen in original HTML if there's no text
                 )}
@@ -59,10 +56,11 @@ export default async function Page() {
             <div style={{ textAlign: 'center' }}>
               {struktur?.photoUrl ? (
                 <div style={{ padding: '15px', display: 'inline-block', width: '100%' }}>
-                  <ImageModal 
+                  <img 
                     src={struktur.photoUrl} 
                     alt="Struktur Organisasi" 
-                    imageStyle={{ 
+                    className="zoomable-image"
+                    style={{ 
                       width: '100%', 
                       height: 'auto',
                       minHeight: '300px',

@@ -45,11 +45,7 @@ export default async function Page() {
 
               <div style={{ color: '#64748b', lineHeight: '1.8', fontSize: '1.05rem', textAlign: 'justify' }}>
                 {kurikulum?.content ? (
-                  kurikulum.content.split('\n').filter(p => p.trim() !== '').map((paragraph, idx) => (
-                    <p key={idx} style={{ marginBottom: '15px' }}>
-                      {paragraph}
-                    </p>
-                  ))
+                  <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: kurikulum.content ? kurikulum.content.replace(/&nbsp;|\u00A0/g, ' ') : '' }} />
                 ) : (
                   <p>Belum ada data kurikulum yang dimasukkan.</p>
                 )}

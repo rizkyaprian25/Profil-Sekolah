@@ -45,19 +45,7 @@ export default async function Page() {
 
               <div style={{ color: '#64748b', lineHeight: '1.8', fontSize: '1.05rem', textAlign: 'justify' }}>
                 {kesiswaan?.content ? (
-                  kesiswaan.content.split('\n').filter(p => p.trim() !== '').map((paragraph, idx) => {
-                    // Check if paragraph is a section header (A., B., or numbers/letters with dots)
-                    const isHeader = /^[A-Z]\.|^[0-9]+\.|^[a-z]\./.test(paragraph.trim()) || paragraph.toUpperCase() === paragraph;
-                    return (
-                      <p key={idx} style={{ 
-                        marginBottom: isHeader ? '5px' : '15px',
-                        fontWeight: isHeader ? 'bold' : 'normal',
-                        marginLeft: paragraph.trim().startsWith('a.') || paragraph.trim().startsWith('b.') || paragraph.trim().startsWith('c.') || paragraph.trim().startsWith('1.') || paragraph.trim().startsWith('2.') ? '20px' : '0'
-                      }}>
-                        {paragraph}
-                      </p>
-                    );
-                  })
+                  <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: kesiswaan.content ? kesiswaan.content.replace(/&nbsp;|\u00A0/g, ' ') : '' }} />
                 ) : (
                   <p>Belum ada data program kesiswaan yang dimasukkan.</p>
                 )}

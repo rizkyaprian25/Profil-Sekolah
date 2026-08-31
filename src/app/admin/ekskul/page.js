@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import RichTextEditor from "@/components/RichTextEditor";
+import Toast from "@/components/Toast";
 
 export default function AdminEkskul() {
   const [ekskuls, setEkskuls] = useState([]);
@@ -137,21 +139,10 @@ export default function AdminEkskul() {
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h1 style={{ color: '#1e293b', margin: 0 }}>Kelola Ekstrakurikuler Siswa</h1>
       </div>
-
-      {/* Notification Toast */}
-      {notification.message && (
-        <div style={{
-          position: 'fixed', top: '20px', right: '20px', zIndex: 1000,
-          background: notification.type === 'success' ? '#10b981' : '#ef4444',
-          color: 'white', padding: '15px 25px', borderRadius: '8px',
-          boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontWeight: 'bold'
-        }}>
-          {notification.message}
-        </div>
-      )}
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
         
@@ -168,7 +159,7 @@ export default function AdminEkskul() {
                 value={title} 
                 onChange={e => setTitle(e.target.value)} 
                 required 
-                placeholder="Misal: Juara 1 Lomba Sains Deskripsi Nasional"
+                placeholder="Misal: Pramuka, Paskibra, Futsal"
                 style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
                 onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
                 onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
@@ -188,27 +179,26 @@ export default function AdminEkskul() {
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Deskripsi</label>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Nama Pembina</label>
                 <input 
-                  value={description} 
-                  onChange={e => setDescription(e.target.value)} 
-                  required
-                  style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none', background: 'white' }}
+                  type="text" 
+                  value={pembina} 
+                  onChange={e => setPembina(e.target.value)} 
+                  required 
+                  placeholder="Misal: Budi Santoso, S.Pd"
+                  style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
                 />
               </div>
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Nama Pembina</label>
-              <input 
-                type="text" 
-                value={pembina} 
-                onChange={e => setPembina(e.target.value)} 
-                required 
-                placeholder="Misal: Budi Santoso, S.Pd"
-                style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+              <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Deskripsi Ekstrakurikuler</label>
+              <RichTextEditor
+                value={description} 
+                onChange={(val) => setDescription(val)} 
+                placeholder="Tuliskan deskripsi lengkap ekstrakurikuler di sini..."
               />
             </div>
 
@@ -295,10 +285,14 @@ export default function AdminEkskul() {
                             <img src={ach.photoUrl} alt={ach.title} style={{ width: '100px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} />
                           </div>
                         )}
-                        <div style={{ margin: '0 0 10px 0', color: '#64748b', fontSize: '0.9rem' }}>
-                          <strong>Oleh:</strong> {ach.pembina} <br/>
-                          <strong>Jadwal:</strong> {ach.jadwal} | <strong>Deskripsi:</strong> {ach.description}
+                        <div style={{ margin: '0 0 6px 0', color: '#64748b', fontSize: '0.9rem' }}>
+                          <strong>Pembina:</strong> {ach.pembina} <br/>
+                          <strong>Jadwal:</strong> {ach.jadwal}
                         </div>
+                        <div 
+                          style={{ margin: '0 0 10px 0', color: '#64748b', fontSize: '0.9rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', wordBreak: 'break-word' }}
+                          dangerouslySetInnerHTML={{ __html: (ach.description || '').replace(/&nbsp;|\u00A0/g, ' ') }}
+                        />
                       </div>
                       <div style={{ display: 'flex', gap: '10px' }}>
                         <button 

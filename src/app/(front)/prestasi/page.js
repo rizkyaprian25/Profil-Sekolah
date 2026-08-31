@@ -49,6 +49,12 @@ export default async function Page() {
                         <td>Tingkat</td>
                         <td>{ach.level}</td>
                       </tr>
+                      {ach.date && (
+                        <tr>
+                          <td>Tanggal</td>
+                          <td>{new Date(ach.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </Link>

@@ -54,9 +54,7 @@ export default async function Page({ params }) {
 
               <div style={{ color: '#64748b', lineHeight: '1.8', fontSize: '1.05rem', textAlign: 'justify', marginBottom: '30px' }}>
                 {sarana.content ? (
-                  sarana.content.split('\n').filter(p => p.trim() !== '').map((paragraph, idx) => (
-                    <p key={idx} style={{ marginBottom: '15px' }}>{paragraph}</p>
-                  ))
+                  <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: sarana.content ? sarana.content.replace(/&nbsp;|\u00A0/g, ' ') : '' }} />
                 ) : (
                   <p>Belum ada deskripsi.</p>
                 )}

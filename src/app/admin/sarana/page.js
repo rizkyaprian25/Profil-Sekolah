@@ -2,10 +2,17 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Toast from "@/components/Toast";
 
 export default function AdminSarana() {
   const [sarana, setSarana] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState({ message: '', type: '' });
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: '', type: '' }), 3500);
+  };
 
   useEffect(() => {
     fetchSarana();
@@ -28,13 +35,14 @@ export default function AdminSarana() {
       try {
         const res = await fetch(`/api/sarana/${id}`, { method: "DELETE" });
         if (res.ok) {
-          alert("Fasilitas berhasil dihapus!");
+          showNotification("Fasilitas berhasil dihapus!", "success");
           fetchSarana();
         } else {
-          alert("Gagal menghapus fasilitas.");
+          showNotification("Gagal menghapus fasilitas.", "error");
         }
       } catch (error) {
         console.error("Error deleting Sarana:", error);
+        showNotification("Terjadi kesalahan saat menghapus fasilitas.", "error");
       }
     }
   };
@@ -43,6 +51,7 @@ export default function AdminSarana() {
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h2 style={{ fontSize: "2rem", color: "#1e293b", margin: 0 }}>Kelola Sarana & Prasarana</h2>
         <Link href="/admin/sarana/form" style={{

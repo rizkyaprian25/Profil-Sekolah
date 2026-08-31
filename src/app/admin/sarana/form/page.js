@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef, Suspense } from "react";
+import RichTextEditor from "@/components/RichTextEditor";
 import { useRouter, useSearchParams } from "next/navigation";
+import Toast from "@/components/Toast";
 
 function SaranaFormContent() {
   const searchParams = useSearchParams();
@@ -16,7 +18,13 @@ function SaranaFormContent() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(!!id);
   const [imageFile, setImageFile] = useState(null);
+  const [notification, setNotification] = useState({ message: '', type: '' });
   const fileInputRef = useRef(null);
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: '', type: '' }), 3500);
+  };
 
   useEffect(() => {
     if (id) {
@@ -35,8 +43,8 @@ function SaranaFormContent() {
           photoUrl: data.photoUrl || "",
         });
       } else {
-        alert("Fasilitas tidak ditemukan");
-        router.push("/admin/sarana");
+        showNotification("Fasilitas tidak ditemukan", "error");
+        setTimeout(() => router.push("/admin/sarana"), 1200);
       }
     } catch (error) {
       console.error("Error fetching Sarana:", error);
@@ -75,7 +83,7 @@ function SaranaFormContent() {
           const uploadData = await uploadRes.json();
           finalImageUrl = uploadData.imageUrl;
         } else {
-          alert("Gagal mengupload gambar");
+          showNotification("Gagal mengunggah gambar.", "error");
           setLoading(false);
           return;
         }
@@ -94,20 +102,22 @@ function SaranaFormContent() {
 
       if (!res.ok) {
         if (res.status === 401) {
-          alert("Sesi Anda telah habis, silakan login kembali.");
-          window.location.href = "/admin/login";
+          showNotification("Sesi Anda telah habis, silakan login kembali.", "error");
+          setTimeout(() => { window.location.href = "/admin/login"; }, 1500);
         } else {
-          alert("Gagal menyimpan data.");
+          showNotification("Gagal menyimpan data.", "error");
         }
         setLoading(false);
         return;
       }
 
-      alert("Fasilitas berhasil disimpan!");
-      router.push("/admin/sarana");
+      showNotification("Fasilitas berhasil disimpan!", "success");
+      setTimeout(() => {
+        router.push("/admin/sarana");
+      }, 1000);
     } catch (error) {
       console.error("Error updating Sarana:", error);
-      alert("Terjadi kesalahan sistem");
+      showNotification("Terjadi kesalahan sistem", "error");
       setLoading(false);
     }
   };
@@ -118,6 +128,7 @@ function SaranaFormContent() {
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <h2 style={{ fontSize: "2rem", marginBottom: "20px", color: "#1e293b" }}>
         {id ? "Edit Fasilitas" : "Tambah Fasilitas"}
       </h2>
@@ -140,13 +151,10 @@ function SaranaFormContent() {
 
           <div>
             <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>Deskripsi Fasilitas</label>
-            <textarea
-              name="content"
+            <RichTextEditor
               value={form.content}
-              onChange={handleChange}
-              rows={8}
-              placeholder="Tambahkan deskripsi tentang fasilitas ini..."
-              style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+              onChange={(val) => setForm({ ...form, content: val })}
+              style={{ height: '300px', marginBottom: '50px', background: 'white' }}
             />
           </div>
 

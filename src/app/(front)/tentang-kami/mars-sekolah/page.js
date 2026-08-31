@@ -88,9 +88,9 @@ export default async function Page() {
               </div>
 
               {mars?.content && (
-                <div style={{ color: '#475569', lineHeight: '1.8', fontSize: '1.1rem', whiteSpace: 'pre-line', padding: '20px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <div style={{ color: '#475569', lineHeight: '1.8', fontSize: '1.1rem', padding: '20px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                   <h4 style={{ color: '#1e293b', marginBottom: '15px' }}>Lirik:</h4>
-                  {mars.content}
+                  <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: mars.content ? mars.content.replace(/&nbsp;|\u00A0/g, ' ') : '' }} />
                 </div>
               )}
             </div>

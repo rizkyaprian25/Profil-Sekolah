@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import RichTextEditor from "@/components/RichTextEditor";
+import Toast from "@/components/Toast";
 
 export default function AdminTeachers() {
   const [teachers, setTeachers] = useState([]);
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('Guru Kelas');
   const [description, setDescription] = useState('');
-  const [education, setEducation] = useState('');
-  const [experience, setExperience] = useState('');
   const [additionalRole, setAdditionalRole] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [editingId, setEditingId] = useState(null);
@@ -20,37 +20,14 @@ export default function AdminTeachers() {
     fetchTeachers();
   }, []);
 
-  const fetchTeachers = async (skipSeed = false) => {
+  const fetchTeachers = async () => {
     try {
       const res = await fetch('/api/teachers');
       const data = await res.json();
-      setTeachers(data);
-      
-      // Auto seed dummy data if empty, but only try once
-      if (data.length === 0 && !skipSeed) {
-        seedDummyData();
-      }
+      if (Array.isArray(data)) setTeachers(data);
     } catch (err) {
       console.error('Failed to fetch teachers:', err);
     }
-  };
-
-  const seedDummyData = async () => {
-    const dummies = [
-      { name: 'Dra. Siti Aminah, M.Pd.', subject: 'Kepala Sekolah', photoUrl: '/images/guru1.png', description: 'Beliau adalah salah satu tenaga pendidik terbaik yang memiliki dedikasi tinggi dalam mencerdaskan anak bangsa. Dengan pendekatan mengajar yang inovatif dan interaktif, beliau selalu berupaya menciptakan suasana kelas yang kondusif bagi perkembangan kognitif maupun karakter siswa.', education: 'S2 Manajemen Pendidikan', experience: 'Lebih dari 15 Tahun', additionalRole: 'Penanggung Jawab Kurikulum' },
-      { name: 'Ahmad Faisal, S.Si.', subject: 'Guru Matematika', photoUrl: '/images/guru1.png', description: 'Berpengalaman dalam membimbing siswa menuju olimpiade sains nasional.', education: 'S1 Matematika Murni', experience: 'Lebih dari 5 Tahun', additionalRole: 'Pembina Olimpiade Matematika' },
-      { name: 'Rini Puspita, S.Pd.', subject: 'Guru Bahasa Inggris', photoUrl: '/images/guru1.png', description: 'Mengutamakan kemampuan public speaking dan conversation dalam bahasa Inggris.', education: 'S1 Pendidikan Bahasa Inggris', experience: 'Lebih dari 8 Tahun', additionalRole: 'Wali Kelas / Pembina English Club' },
-      { name: 'Hendra Kusuma, S.Or.', subject: 'Guru Penjaskes', photoUrl: '/images/guru1.png', description: 'Mencetak atlet-atlet muda berbakat dari sekolah.', education: 'S1 Pendidikan Jasmani dan Olahraga', experience: 'Lebih dari 10 Tahun', additionalRole: 'Pelatih Ekstrakurikuler Futsal' }
-    ];
-    
-    for (const dummy of dummies) {
-      await fetch('/api/teachers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dummy)
-      });
-    }
-    fetchTeachers(true); // Pass true to avoid infinite loop if seeding fails
   };
 
   const showNotification = (message, type) => {
@@ -89,7 +66,7 @@ export default function AdminTeachers() {
         }
       }
       
-      const payload = { name, subject, photoUrl: finalImageUrl, description, education, experience, additionalRole };
+      const payload = { name, subject, photoUrl: finalImageUrl, description, additionalRole };
       let res;
 
       if (editingId) {
@@ -110,8 +87,6 @@ export default function AdminTeachers() {
         setName('');
         setSubject('Guru Kelas');
         setDescription('');
-        setEducation('');
-        setExperience('');
         setAdditionalRole('');
         setImageFile(null);
         setEditingId(null);
@@ -133,8 +108,6 @@ export default function AdminTeachers() {
     setName(t.name);
     setSubject(t.subject || 'Guru Kelas');
     setDescription(t.description || '');
-    setEducation(t.education || '');
-    setExperience(t.experience || '');
     setAdditionalRole(t.additionalRole || '');
     setEditingId(t.id);
     setExistingImageUrl(t.photoUrl || '');
@@ -146,8 +119,6 @@ export default function AdminTeachers() {
     setName('');
     setSubject('Guru Kelas');
     setDescription('');
-    setEducation('');
-    setExperience('');
     setAdditionalRole('');
     setEditingId(null);
     setExistingImageUrl('');
@@ -170,20 +141,8 @@ export default function AdminTeachers() {
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <h1 style={{ fontSize: '2rem', color: '#0f172a', marginBottom: '30px', fontWeight: 'bold' }}>Kelola Data Guru</h1>
-      
-      {notification.message && (
-        <div style={{ 
-          padding: '15px 20px', 
-          marginBottom: '25px', 
-          borderRadius: '8px',
-          background: notification.type === 'success' ? '#dcfce7' : '#fee2e2',
-          color: notification.type === 'success' ? '#166534' : '#991b1b',
-          border: `1px solid ${notification.type === 'success' ? '#bbf7d0' : '#fecaca'}`
-        }}>
-          {notification.message}
-        </div>
-      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
         
@@ -216,34 +175,10 @@ export default function AdminTeachers() {
 
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Biografi / Deskripsi (Opsional)</label>
-              <textarea 
+              <RichTextEditor
                 value={description} 
-                onChange={e => setDescription(e.target.value)} 
-                placeholder="Ceritakan secara singkat profil dan dedikasi guru ini..."
-                rows={4}
-                style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none', resize: 'vertical' }}
-              />
-            </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Pendidikan Terakhir (Opsional)</label>
-              <input 
-                type="text" 
-                value={education} 
-                onChange={e => setEducation(e.target.value)} 
-                placeholder="Misal: S1 Pendidikan Universitas Negeri"
-                style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
-              />
-            </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Masa Bakti (Opsional)</label>
-              <input 
-                type="text" 
-                value={experience} 
-                onChange={e => setExperience(e.target.value)} 
-                placeholder="Misal: Lebih dari 8 Tahun"
-                style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
+                onChange={(val) => setDescription(val)} 
+                placeholder="Tuliskan biografi atau keterangan guru..."
               />
             </div>
 

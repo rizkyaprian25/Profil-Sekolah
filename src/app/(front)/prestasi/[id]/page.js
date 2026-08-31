@@ -103,6 +103,12 @@ export default async function AchievementDetail({ params }) {
                     <td style={{ padding: '12px 0', color: '#64748b', fontWeight: 'bold' }}>Kategori</td>
                     <td style={{ padding: '12px 0', color: '#0f172a', fontWeight: '600' }}>{ach.category}</td>
                   </tr>
+                  {ach.date && (
+                    <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                      <td style={{ padding: '12px 0', color: '#64748b', fontWeight: 'bold' }}>Tanggal</td>
+                      <td style={{ padding: '12px 0', color: '#0f172a', fontWeight: '600' }}>{new Date(ach.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</td>
+                    </tr>
+                  )}
                   <tr>
                     <td style={{ padding: '12px 0', color: '#64748b', fontWeight: 'bold' }}>Tingkat</td>
                     <td style={{ padding: '12px 0', color: '#0f172a', fontWeight: '600' }}>{ach.level}</td>
@@ -113,7 +119,10 @@ export default async function AchievementDetail({ params }) {
 
             <div style={{ color: '#475569', fontSize: '1.05rem', lineHeight: '1.8', marginBottom: '30px' }}>
               {ach.description ? (
-                <p style={{ whiteSpace: 'pre-line' }}>{ach.description}</p>
+                <div 
+                  className="rich-text-content" 
+                  dangerouslySetInnerHTML={{ __html: ach.description.replace(/&nbsp;|\u00A0/g, ' ') }} 
+                />
               ) : (
                 <>
                   <p>

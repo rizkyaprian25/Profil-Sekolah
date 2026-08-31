@@ -49,15 +49,20 @@ export default async function Page() {
                   {ekskul.title}
                 </h2>
                 
-                <p style={{ 
-                  color: '#666', 
-                  fontSize: '1rem', 
-                  lineHeight: '1.8', 
-                  marginBottom: '30px',
-                  textAlign: 'justify'
-                }}>
-                  {ekskul.description.length > 150 ? ekskul.description.substring(0, 150) + '...' : ekskul.description}
-                </p>
+                {(() => {
+                  const plainText = (ekskul.description || '').replace(/<[^>]+>/g, '').replace(/&nbsp;|\u00A0/g, ' ').trim();
+                  return (
+                    <p style={{ 
+                      color: '#666', 
+                      fontSize: '1rem', 
+                      lineHeight: '1.8', 
+                      marginBottom: '30px',
+                      textAlign: 'justify'
+                    }}>
+                      {plainText.length > 150 ? plainText.substring(0, 150) + '...' : plainText}
+                    </p>
+                  );
+                })()}
                 
                 <div style={{ 
                   display: 'flex', 

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import Toast from "@/components/Toast";
 
 export default function SlidersAdmin() {
   const [sliders, setSliders] = useState([]);
@@ -8,7 +9,13 @@ export default function SlidersAdmin() {
   const [imageFile, setImageFile] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState({ message: '', type: '' });
   const fileInputRef = useRef(null);
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: '', type: '' }), 3500);
+  };
 
   const fetchSliders = async () => {
     setLoading(true);
@@ -49,14 +56,14 @@ export default function SlidersAdmin() {
           const uploadData = await uploadRes.json();
           finalImageUrl = uploadData.imageUrl;
         } else {
-          alert("Gagal mengunggah gambar.");
+          showNotification("Gagal mengunggah gambar.", "error");
           setLoading(false);
           return;
         }
       }
 
       if (!finalImageUrl) {
-        alert("Gambar tidak boleh kosong.");
+        showNotification("Gambar tidak boleh kosong.", "error");
         setLoading(false);
         return;
       }
@@ -69,12 +76,14 @@ export default function SlidersAdmin() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
+        showNotification("Banner slider berhasil diperbarui!", "success");
       } else {
         await fetch("/api/sliders", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
+        showNotification("Banner slider berhasil ditambahkan!", "success");
       }
       
       // Reset form
@@ -86,7 +95,7 @@ export default function SlidersAdmin() {
       fetchSliders();
     } catch (error) {
       console.error("Error saving slider:", error);
-      alert("Terjadi kesalahan saat menyimpan data.");
+      showNotification("Terjadi kesalahan saat menyimpan data.", "error");
     } finally {
       setLoading(false);
     }
@@ -107,15 +116,17 @@ export default function SlidersAdmin() {
     if (confirm("Apakah Anda yakin ingin menghapus slider ini?")) {
       try {
         await fetch(`/api/sliders/${id}`, { method: "DELETE" });
+        showNotification("Banner slider berhasil dihapus!", "success");
         fetchSliders();
-      } catch (error) {
-        console.error("Error deleting slider:", error);
+      } catch (err) {
+        showNotification("Gagal menghapus slider.", "error");
       }
     }
   };
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <h2 style={{ fontSize: "2rem", marginBottom: "20px", color: "#1e293b" }}>Kelola Banner (Slider)</h2>
 
       <div style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.05)", marginBottom: "30px" }}>

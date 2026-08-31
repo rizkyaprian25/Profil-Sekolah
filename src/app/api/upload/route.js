@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 
@@ -16,20 +16,17 @@ export async function POST(request) {
     const file = data.get('image');
 
     if (!file || typeof file === 'string') {
-      console.log('Upload error: No file found or file is a string');
       return NextResponse.json({ error: 'No image file found' }, { status: 400 });
     }
 
     // MIME type check
     if (!file.type || !file.type.startsWith('image/')) {
-      console.log('Upload error: Invalid file type:', file.type);
       return NextResponse.json({ error: 'Invalid file type. Only images are allowed.' }, { status: 400 });
     }
 
     // Size limit check (20MB)
     const MAX_SIZE = 20 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      console.log('Upload error: File too large:', file.size);
       return NextResponse.json({ error: 'File size exceeds 20MB limit.' }, { status: 400 });
     }
 
@@ -41,7 +38,11 @@ export async function POST(request) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     // Force webp extension for optimized image
     const filename = uniqueSuffix + '.webp';
-    const filepath = path.join(process.cwd(), 'public/uploads', filename);
+    const uploadDir = path.join(process.cwd(), 'public/uploads');
+    const filepath = path.join(uploadDir, filename);
+
+    // Ensure uploads directory exists on server
+    await mkdir(uploadDir, { recursive: true });
 
     // Compress with sharp
     const optimizedBuffer = await sharp(buffer)

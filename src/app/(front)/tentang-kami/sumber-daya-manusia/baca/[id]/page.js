@@ -99,10 +99,15 @@ export default async function Page({ params }) {
             
             <div style={{ padding: '24px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', color: '#475569', fontSize: '1.1rem', lineHeight: '1.8' }}>
               <h3 style={{ fontSize: '1.2rem', color: '#1e293b', marginBottom: '10px' }}>Peran & Tanggung Jawab</h3>
-              <p style={{ margin: 0 }}>
+              <p style={{ margin: '0 0 10px 0', fontWeight: 'bold' }}>
                 {teacher.subject} {teacher.additionalRole ? `sekaligus ${teacher.additionalRole}` : ''}
-                {teacher.description ? ` - ${teacher.description}` : ''}
               </p>
+              {teacher.description && (
+                <div 
+                  className="rich-text-content"
+                  dangerouslySetInnerHTML={{ __html: teacher.description.replace(/&nbsp;|\u00A0/g, ' ') }} 
+                />
+              )}
             </div>
           </div>
 

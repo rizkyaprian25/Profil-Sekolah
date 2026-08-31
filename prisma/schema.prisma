@@ -57,6 +57,7 @@ model Achievement {
   level       String
   imageUrl    String?
   description String?
+  date        DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

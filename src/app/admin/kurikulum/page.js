@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import RichTextEditor from "@/components/RichTextEditor";
+import Image from "next/image";
+import Toast from "@/components/Toast";
 
 export default function AdminKurikulum() {
   const [form, setForm] = useState({
@@ -11,7 +14,13 @@ export default function AdminKurikulum() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [imageFile, setImageFile] = useState(null);
+  const [notification, setNotification] = useState({ message: '', type: '' });
   const fileInputRef = useRef(null);
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: '', type: '' }), 3500);
+  };
 
   useEffect(() => {
     fetchKurikulum();
@@ -65,7 +74,7 @@ export default function AdminKurikulum() {
           const uploadData = await uploadRes.json();
           finalImageUrl = uploadData.imageUrl;
         } else {
-          alert("Gagal mengupload gambar");
+          showNotification("Gagal mengunggah gambar.", "error");
           setLoading(false);
           return;
         }
@@ -81,10 +90,10 @@ export default function AdminKurikulum() {
 
       if (!res.ok) {
         if (res.status === 401) {
-          alert("Sesi Anda telah habis, silakan login kembali.");
-          window.location.href = "/admin/login";
+          showNotification("Sesi Anda telah habis, silakan login kembali.", "error");
+          setTimeout(() => { window.location.href = "/admin/login"; }, 1500);
         } else {
-          alert("Gagal menyimpan data.");
+          showNotification("Gagal menyimpan data.", "error");
         }
         setLoading(false);
         return;
@@ -92,11 +101,11 @@ export default function AdminKurikulum() {
 
       setImageFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      alert("Kurikulum berhasil disimpan!");
+      showNotification("Kurikulum berhasil disimpan!", "success");
       fetchKurikulum();
     } catch (error) {
       console.error("Error updating Kurikulum:", error);
-      alert("Terjadi kesalahan sistem");
+      showNotification("Terjadi kesalahan sistem", "error");
     } finally {
       setLoading(false);
     }
@@ -108,6 +117,7 @@ export default function AdminKurikulum() {
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <h2 style={{ fontSize: "2rem", marginBottom: "20px", color: "#1e293b" }}>Kelola Kurikulum</h2>
       
       <div style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.05)", marginBottom: "30px" }}>
@@ -131,14 +141,11 @@ export default function AdminKurikulum() {
 
           <div>
             <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>Isi Teks Kurikulum (Opsional)</label>
-            <textarea
-              name="content"
-              value={form.content}
-              onChange={handleChange}
-              rows={5}
-              placeholder="Tambahkan penjelasan kurikulum jika diperlukan..."
-              style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-            />
+          <RichTextEditor
+            value={form.content}
+            onChange={(val) => setForm({ ...form, content: val })}
+            style={{ height: '300px', marginBottom: '50px', background: 'white' }}
+          />
           </div>
 
           <div>

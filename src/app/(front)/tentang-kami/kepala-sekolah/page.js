@@ -44,11 +44,7 @@ export default async function Page() {
             {/* Kolom Teks */}
             <div style={{ color: '#64748b', lineHeight: '1.8', fontSize: '1.05rem', textAlign: 'justify' }}>
               {kepsek?.content ? (
-                kepsek.content.split('\n').filter(p => p.trim() !== '').map((paragraph, idx) => (
-                  <p key={idx} style={{ marginBottom: '20px' }}>
-                    {paragraph}
-                  </p>
-                ))
+                <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: kepsek.content ? kepsek.content.replace(/&nbsp;|\u00A0/g, ' ') : '' }} />
               ) : (
                 <p>Belum ada data sejarah kepemimpinan yang dimasukkan.</p>
               )}
@@ -76,11 +72,7 @@ export default async function Page() {
                 </table>
                 
                 {kepsek?.karir && (
-                  <ul style={{ paddingLeft: '20px', marginTop: '-10px', listStyleType: 'disc' }}>
-                    {kepsek.karir.split('\n').filter(p => p.trim() !== '').map((item, idx) => (
-                      <li key={idx} style={{ marginBottom: '8px' }}>{item}</li>
-                    ))}
-                  </ul>
+                  <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: kepsek.karir ? kepsek.karir.replace(/&nbsp;|\u00A0/g, ' ') : '' }} />
                 )}
               </div>
             </div>

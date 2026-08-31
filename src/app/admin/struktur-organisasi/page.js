@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import RichTextEditor from "@/components/RichTextEditor";
+import Toast from "@/components/Toast";
 
 export default function AdminStruktur() {
   const [form, setForm] = useState({
@@ -11,7 +13,13 @@ export default function AdminStruktur() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [imageFile, setImageFile] = useState(null);
+  const [notification, setNotification] = useState({ message: '', type: '' });
   const fileInputRef = useRef(null);
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: '', type: '' }), 3500);
+  };
 
   useEffect(() => {
     fetchStruktur();
@@ -65,7 +73,7 @@ export default function AdminStruktur() {
           const uploadData = await uploadRes.json();
           finalImageUrl = uploadData.imageUrl;
         } else {
-          alert("Gagal mengupload gambar");
+          showNotification("Gagal mengunggah gambar.", "error");
           setLoading(false);
           return;
         }
@@ -81,10 +89,10 @@ export default function AdminStruktur() {
 
       if (!res.ok) {
         if (res.status === 401) {
-          alert("Sesi Anda telah habis, silakan login kembali.");
-          window.location.href = "/admin/login";
+          showNotification("Sesi Anda telah habis, silakan login kembali.", "error");
+          setTimeout(() => { window.location.href = "/admin/login"; }, 1500);
         } else {
-          alert("Gagal menyimpan data.");
+          showNotification("Gagal menyimpan data.", "error");
         }
         setLoading(false);
         return;
@@ -92,11 +100,11 @@ export default function AdminStruktur() {
 
       setImageFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      alert("Struktur Organisasi berhasil disimpan!");
+      showNotification("Struktur Organisasi berhasil disimpan!", "success");
       fetchStruktur();
     } catch (error) {
       console.error("Error updating Struktur:", error);
-      alert("Terjadi kesalahan sistem");
+      showNotification("Terjadi kesalahan sistem", "error");
     } finally {
       setLoading(false);
     }
@@ -108,6 +116,7 @@ export default function AdminStruktur() {
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <h2 style={{ fontSize: "2rem", marginBottom: "20px", color: "#1e293b" }}>Kelola Struktur Organisasi</h2>
       
       <div style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.05)", marginBottom: "30px" }}>
@@ -131,13 +140,10 @@ export default function AdminStruktur() {
 
           <div>
             <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>Teks / Penjelasan Tambahan (Opsional)</label>
-            <textarea
-              name="content"
+            <RichTextEditor
               value={form.content}
-              onChange={handleChange}
-              rows={4}
-              placeholder="Kosongkan jika hanya ingin menampilkan gambar struktur saja."
-              style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+              onChange={(val) => setForm({ ...form, content: val })}
+              style={{ height: '300px', marginBottom: '50px', background: 'white' }}
             />
           </div>
 

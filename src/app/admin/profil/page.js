@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import Toast from "@/components/Toast";
 
 export default function ProfilAdmin() {
   const [form, setForm] = useState({ 
@@ -19,7 +20,13 @@ export default function ProfilAdmin() {
   });
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState({ message: '', type: '' });
   const fileInputRef = useRef(null);
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: '', type: '' }), 3500);
+  };
 
   const fetchProfil = async () => {
     setLoading(true);
@@ -77,7 +84,7 @@ export default function ProfilAdmin() {
           const uploadData = await uploadRes.json();
           finalImageUrl = uploadData.imageUrl;
         } else {
-          alert("Gagal mengunggah gambar.");
+          showNotification("Gagal mengunggah gambar.", "error");
           setLoading(false);
           return;
         }
@@ -93,10 +100,10 @@ export default function ProfilAdmin() {
 
       if (!res.ok) {
         if (res.status === 401) {
-          alert("Sesi Anda telah habis, silakan login kembali.");
-          window.location.href = "/admin/login";
+          showNotification("Sesi Anda telah habis, silakan login kembali.", "error");
+          setTimeout(() => { window.location.href = "/admin/login"; }, 1500);
         } else {
-          alert("Gagal menyimpan data.");
+          showNotification("Gagal menyimpan data.", "error");
         }
         setLoading(false);
         return;
@@ -104,11 +111,11 @@ export default function ProfilAdmin() {
       
       setImageFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      alert("Profil Sekolah berhasil disimpan!");
+      showNotification("Profil Sekolah berhasil disimpan!", "success");
       fetchProfil();
     } catch (error) {
       console.error("Error saving profil:", error);
-      alert("Terjadi kesalahan saat menyimpan data.");
+      showNotification("Terjadi kesalahan saat menyimpan data.", "error");
     } finally {
       setLoading(false);
     }
@@ -116,6 +123,7 @@ export default function ProfilAdmin() {
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <h2 style={{ fontSize: "2rem", marginBottom: "20px", color: "#1e293b" }}>Kelola Profil Sekolah</h2>
 
       <div style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.05)", marginBottom: "30px" }}>

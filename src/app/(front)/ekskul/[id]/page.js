@@ -60,15 +60,10 @@ export default async function EkskulDetail({ params }) {
               </p>
             )}
             
-            <div style={{ 
-              color: '#475569', 
-              fontSize: '1.05rem', 
-              lineHeight: '1.8', 
-              whiteSpace: 'pre-line',
-              textAlign: 'justify'
-            }}>
-              {ekskul.description}
-            </div>
+            <div 
+              className="rich-text-content"
+              dangerouslySetInnerHTML={{ __html: (ekskul.description || '').replace(/&nbsp;|\u00A0/g, ' ') }}
+            />
 
             <div style={{ marginTop: '50px' }}>
               <Link href="/ekskul" style={{ color: '#1E90FF', textDecoration: 'none', fontWeight: '600' }}>

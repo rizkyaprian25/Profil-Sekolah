@@ -1,21 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import 'react-quill-new/dist/quill.snow.css';
-
-const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
-
-const quillModules = {
-  toolbar: [
-    [{ 'header': [1, 2, 3, false] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    [{ 'color': [] }, { 'background': [] }],
-    ['link'],
-    ['clean']
-  ],
-};
+import RichTextEditor from "@/components/RichTextEditor";
+import Toast from "@/components/Toast";
 
 export default function AdminPosts() {
   const [posts, setPosts] = useState([]);
@@ -144,21 +131,10 @@ export default function AdminPosts() {
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h1 style={{ color: '#1e293b', margin: 0 }}>Kelola Berita & Kegiatan</h1>
       </div>
-
-      {/* Notification Toast */}
-      {notification.message && (
-        <div style={{
-          position: 'fixed', top: '20px', right: '20px', zIndex: 1000,
-          background: notification.type === 'success' ? '#10b981' : '#ef4444',
-          color: 'white', padding: '15px 25px', borderRadius: '8px',
-          boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontWeight: 'bold'
-        }}>
-          {notification.message}
-        </div>
-      )}
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
         
@@ -210,13 +186,11 @@ export default function AdminPosts() {
             </div>
             <div style={{ marginBottom: '25px' }}>
               <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Isi Berita</label>
-              <ReactQuill 
-                theme="snow"
+              <RichTextEditor
                 value={content} 
                 onChange={setContent}
-                modules={quillModules}
                 placeholder="Tulis detail berita atau pengumuman di sini..."
-                style={{ background: 'white', borderRadius: '6px' }}
+                style={{ height: '300px', marginBottom: '50px', background: 'white' }}
               />
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -273,8 +247,8 @@ export default function AdminPosts() {
                           </div>
                         )}
                         <div 
-                          style={{ margin: '0 0 10px 0', color: '#64748b', fontSize: '0.9rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
-                          dangerouslySetInnerHTML={{ __html: post.content }}
+                          style={{ margin: '0 0 10px 0', color: '#64748b', fontSize: '0.9rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', wordBreak: 'break-word' }}
+                          dangerouslySetInnerHTML={{ __html: post.content ? post.content.replace(/&nbsp;|\u00A0/g, ' ') : '' }}
                         />
                         <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.8rem' }}>
                           📅 {new Date(post.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}

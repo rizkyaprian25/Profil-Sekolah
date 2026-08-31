@@ -1,6 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import RichTextEditor from "@/components/RichTextEditor";
+import Toast from "@/components/Toast";
+
+
+
 
 export default function AdminAchievements() {
   const [achievements, setAchievements] = useState([]);
@@ -9,6 +14,7 @@ export default function AdminAchievements() {
   const [studentName, setStudentName] = useState('');
   const [level, setLevel] = useState('Sekolah');
   const [description, setDescription] = useState('');
+  const [date, setDate] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [existingImageUrl, setExistingImageUrl] = useState('');
@@ -61,7 +67,7 @@ export default function AdminAchievements() {
         }
       }
 
-      const payload = { title, category, studentName, level, imageUrl: finalImageUrl, description };
+      const payload = { title, category, studentName, level, imageUrl: finalImageUrl, description, date };
       let res;
 
       if (editingId) {
@@ -84,6 +90,7 @@ export default function AdminAchievements() {
         setStudentName('');
         setLevel('Sekolah');
         setDescription('');
+        setDate('');
         setImageFile(null);
         setEditingId(null);
         setExistingImageUrl('');
@@ -106,6 +113,7 @@ export default function AdminAchievements() {
     setStudentName(ach.studentName);
     setLevel(ach.level || 'Sekolah');
     setDescription(ach.description || '');
+    setDate(ach.date ? new Date(ach.date).toISOString().split('T')[0] : '');
     setEditingId(ach.id);
     setExistingImageUrl(ach.imageUrl || '');
     setImageFile(null);
@@ -118,6 +126,7 @@ export default function AdminAchievements() {
     setStudentName('');
     setLevel('Sekolah');
     setDescription('');
+    setDate('');
     setEditingId(null);
     setExistingImageUrl('');
     setImageFile(null);
@@ -141,21 +150,10 @@ export default function AdminAchievements() {
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h1 style={{ color: '#1e293b', margin: 0 }}>Kelola Prestasi Siswa</h1>
       </div>
-
-      {/* Notification Toast */}
-      {notification.message && (
-        <div style={{
-          position: 'fixed', top: '20px', right: '20px', zIndex: 1000,
-          background: notification.type === 'success' ? '#10b981' : '#ef4444',
-          color: 'white', padding: '15px 25px', borderRadius: '8px',
-          boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontWeight: 'bold'
-        }}>
-          {notification.message}
-        </div>
-      )}
       
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
         
@@ -210,30 +208,39 @@ export default function AdminAchievements() {
               </div>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Nama Siswa / Tim (Oleh)</label>
-              <input 
-                type="text" 
-                value={studentName} 
-                onChange={e => setStudentName(e.target.value)} 
-                required 
-                placeholder="Misal: Anisa Rahma"
-                style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Nama Siswa / Tim (Oleh)</label>
+                <input 
+                  type="text" 
+                  value={studentName} 
+                  onChange={e => setStudentName(e.target.value)} 
+                  required 
+                  placeholder="Misal: Anisa Rahma"
+                  style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none' }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Tanggal Pencapaian</label>
+                <input 
+                  type="date" 
+                  value={date} 
+                  onChange={e => setDate(e.target.value)} 
+                  style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none', fontFamily: 'inherit', color: '#475569' }}
+                  onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                />
+              </div>
             </div>
 
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', marginBottom: '8px', color: '#475569', fontWeight: 'bold' }}>Deskripsi / Ucapan (Opsional)</label>
-              <textarea 
+              <RichTextEditor
                 value={description} 
-                onChange={e => setDescription(e.target.value)} 
-                placeholder="Misal: Alhamdulillah, selamat dan sukses atas pencapaian..."
-                rows={4}
-                style={{ width: '100%', padding: '12px', border: '1px solid #cbd5e1', borderRadius: '6px', outline: 'none', resize: 'vertical' }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                onChange={(val) => setDescription(val)} 
+                style={{ height: '200px', marginBottom: '40px', background: 'white' }} 
               />
             </div>
 
@@ -320,7 +327,8 @@ export default function AdminAchievements() {
                         )}
                         <div style={{ margin: '0 0 10px 0', color: '#64748b', fontSize: '0.9rem' }}>
                           <strong>Oleh:</strong> {ach.studentName} <br/>
-                          <strong>Kategori:</strong> {ach.category} | <strong>Tingkat:</strong> {ach.level}
+                          <strong>Kategori:</strong> {ach.category} | <strong>Tingkat:</strong> {ach.level} <br/>
+                          <strong>Tanggal:</strong> {ach.date ? new Date(ach.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'}
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '10px' }}>

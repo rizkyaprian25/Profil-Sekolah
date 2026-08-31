@@ -1,7 +1,6 @@
 import { isAuthenticated } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { jwtVerify } from 'jose';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,9 +20,17 @@ export async function POST(request) {
   try {
     
 
-    const { title, category, studentName, level, imageUrl, description } = await request.json();
+    const { title, category, studentName, level, imageUrl, description, date } = await request.json();
     const newAchievement = await prisma.achievement.create({
-      data: { title, category, studentName, level, imageUrl, description }
+      data: { 
+        title, 
+        category, 
+        studentName, 
+        level, 
+        imageUrl, 
+        description,
+        date: date ? new Date(date) : null
+      }
     });
     return NextResponse.json(newAchievement);
   } catch (error) {

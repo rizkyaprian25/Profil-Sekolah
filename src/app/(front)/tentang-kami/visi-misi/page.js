@@ -6,10 +6,7 @@ export const revalidate = 60; // Disable cache for demo purposes
 export default async function Page() {
   const visimisi = await prisma.visiMisi.findFirst();
 
-  // Memisahkan teks misi berdasarkan baris baru menjadi array
-  const misiList = visimisi?.misi 
-    ? visimisi.misi.split('\n').filter(m => m.trim() !== '') 
-    : [];
+  // Misi and Visi are now HTML strings
 
   return (
     <main style={{ paddingBottom: '0', background: '#f8f9fa' }}>
@@ -57,27 +54,27 @@ export default async function Page() {
               </h2>
               
               <div style={{ color: '#475569', lineHeight: '1.8', fontSize: '1.05rem', marginBottom: '40px' }}>
-                <p>
-                  {visimisi?.visi || "Visi SMP Negeri 3 Cibungbulang adalah mewujudkan siswa unggul, ramah lingkungan, berpijak pada kearifan lokal, bermutu global dan berkarakter Pancasila."}
-                </p>
+                {visimisi?.visi ? (
+                  <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: visimisi.visi ? visimisi.visi.replace(/&nbsp;|\u00A0/g, ' ') : '' }} />
+                ) : (
+                  <p>
+                    Visi SMP Negeri 3 Cibungbulang adalah mewujudkan siswa unggul, ramah lingkungan, berpijak pada kearifan lokal, bermutu global dan berkarakter Pancasila.
+                  </p>
+                )}
               </div>
 
               <div style={{ color: '#475569', lineHeight: '1.8', fontSize: '1.05rem' }}>
                 <p style={{ marginBottom: '15px' }}>Misi SMP Negeri 3 Cibungbulang sebagai berikut:</p>
-                <ol className="misi-list">
-                  {misiList.length > 0 ? (
-                    misiList.map((misi, idx) => (
-                      <li key={idx}>{misi}</li>
-                    ))
-                  ) : (
-                    <>
-                      <li>Mengembangkan berbagai kegiatan peningkatan kompetensi peserta didik dalam bidang akademik dan nonakademik.</li>
-                      <li>Melaksanakan kegiatan pembelajaran yang efektif yaitu pembelajaran yang aktif, produktif, kreatif, inovatif, menyenangkan dan bermakna.</li>
-                      <li>Meningkatkan gerakan literasi sekolah yang dapat mengarahkan warga sekolah untuk menjadi warga yang cinta baca, cinta menulis dan cinta mencipta.</li>
-                      <li>Mengembangkan perencanaan pembelajaran dan penilaian berbasis Higher Order Thinking Skill (HOTS) dan Life Skill.</li>
-                    </>
-                  )}
-                </ol>
+                {visimisi?.misi ? (
+                  <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: visimisi.misi ? visimisi.misi.replace(/&nbsp;|\u00A0/g, ' ') : '' }} />
+                ) : (
+                  <ol className="misi-list">
+                    <li>Mengembangkan berbagai kegiatan peningkatan kompetensi peserta didik dalam bidang akademik dan nonakademik.</li>
+                    <li>Melaksanakan kegiatan pembelajaran yang efektif yaitu pembelajaran yang aktif, produktif, kreatif, inovatif, menyenangkan dan bermakna.</li>
+                    <li>Meningkatkan gerakan literasi sekolah yang dapat mengarahkan warga sekolah untuk menjadi warga yang cinta baca, cinta menulis dan cinta mencipta.</li>
+                    <li>Mengembangkan perencanaan pembelajaran dan penilaian berbasis Higher Order Thinking Skill (HOTS) dan Life Skill.</li>
+                  </ol>
+                )}
               </div>
             </div>
 

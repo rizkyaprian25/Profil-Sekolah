@@ -45,11 +45,7 @@ export default async function Page() {
             {/* Kolom Teks Sejarah */}
             <div style={{ color: '#64748b', lineHeight: '1.8', fontSize: '1.05rem', textAlign: 'justify' }}>
               {sejarah?.content ? (
-                sejarah.content.split('\n').filter(p => p.trim() !== '').map((paragraph, idx) => (
-                  <p key={idx} style={{ marginBottom: '20px' }}>
-                    {paragraph}
-                  </p>
-                ))
+                <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: sejarah.content ? sejarah.content.replace(/&nbsp;|\u00A0/g, ' ') : '' }} />
               ) : (
                 <p>Belum ada data sejarah yang dimasukkan.</p>
               )}

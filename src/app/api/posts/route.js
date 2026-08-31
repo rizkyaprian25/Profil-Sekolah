@@ -1,7 +1,6 @@
 import { isAuthenticated } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { jwtVerify } from 'jose';
 
 export const dynamic = 'force-dynamic';
 

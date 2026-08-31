@@ -1,7 +1,6 @@
 import { isAuthenticated } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { jwtVerify } from 'jose';
 
 import { unlink } from 'fs/promises';
 import path from 'path';

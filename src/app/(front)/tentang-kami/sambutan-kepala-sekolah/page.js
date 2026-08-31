@@ -51,13 +51,9 @@ export default async function Page() {
             </div>
 
             {/* Text Flowing */}
-            <div style={{ color: '#4b5563', lineHeight: '1.8', fontSize: '1.05rem', textAlign: 'justify' }}>
+            <div className="rich-text-content">
               {sambutan?.content ? (
-                sambutan.content.split('\n').filter(p => p.trim() !== '').map((paragraph, idx) => (
-                  <p key={idx} style={{ marginBottom: '20px' }}>
-                    {paragraph}
-                  </p>
-                ))
+                <div dangerouslySetInnerHTML={{ __html: sambutan.content.replace(/&nbsp;|\u00A0/g, ' ') }} />
               ) : (
                 <>
                   <p style={{ marginBottom: '20px' }}>

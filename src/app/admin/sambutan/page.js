@@ -1,12 +1,20 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import RichTextEditor from "@/components/RichTextEditor";
 import Image from "next/image";
+import Toast from "@/components/Toast";
 
 export default function SambutanAdmin() {
   const [form, setForm] = useState({ title: "", content: "", photoUrl: "" });
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState({ message: '', type: '' });
   const fileInputRef = useRef(null);
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: '', type: '' }), 3500);
+  };
 
   const fetchSambutan = async () => {
     setLoading(true);
@@ -51,14 +59,14 @@ export default function SambutanAdmin() {
           const uploadData = await uploadRes.json();
           finalImageUrl = uploadData.imageUrl;
         } else {
-          alert("Gagal mengunggah gambar.");
+          showNotification("Gagal mengunggah gambar.", "error");
           setLoading(false);
           return;
         }
       }
 
       if (!finalImageUrl) {
-        alert("Foto tidak boleh kosong.");
+        showNotification("Foto tidak boleh kosong.", "error");
         setLoading(false);
         return;
       }
@@ -73,10 +81,10 @@ export default function SambutanAdmin() {
 
       if (!res.ok) {
         if (res.status === 401) {
-          alert("Sesi Anda telah habis, silakan login kembali.");
-          window.location.href = "/admin/login";
+          showNotification("Sesi Anda telah habis, silakan login kembali.", "error");
+          setTimeout(() => { window.location.href = "/admin/login"; }, 1500);
         } else {
-          alert("Gagal menyimpan data.");
+          showNotification("Gagal menyimpan data.", "error");
         }
         setLoading(false);
         return;
@@ -84,11 +92,11 @@ export default function SambutanAdmin() {
       
       setImageFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      alert("Sambutan Kepala Sekolah berhasil disimpan!");
+      showNotification("Sambutan Kepala Sekolah berhasil disimpan!", "success");
       fetchSambutan();
     } catch (error) {
       console.error("Error saving sambutan:", error);
-      alert("Terjadi kesalahan saat menyimpan data.");
+      showNotification("Terjadi kesalahan saat menyimpan data.", "error");
     } finally {
       setLoading(false);
     }
@@ -96,6 +104,7 @@ export default function SambutanAdmin() {
 
   return (
     <div>
+      <Toast notification={notification} onClose={() => setNotification({ message: '', type: '' })} />
       <h2 style={{ fontSize: "2rem", marginBottom: "20px", color: "#1e293b" }}>Kelola Sambutan Kepala Sekolah</h2>
 
       <div style={{ background: "white", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.05)", marginBottom: "30px" }}>
@@ -155,14 +164,7 @@ export default function SambutanAdmin() {
             {/* Isi Sambutan */}
             <div>
               <label style={{ display: "block", marginBottom: "5px", color: "#475569" }}>Isi Sambutan (Bisa berisi paragraf panjang)</label>
-              <textarea
-                value={form.content}
-                onChange={(e) => setForm({ ...form, content: e.target.value })}
-                rows="15"
-                placeholder="Ketik isi sambutan di sini..."
-                style={{ width: "100%", padding: "10px", border: "1px solid #cbd5e1", borderRadius: "4px", resize: "vertical" }}
-                required
-              />
+              <RichTextEditor value={form.content} onChange={(val) => setForm({ ...form, content: val }) } style={{ height: '300px', marginBottom: '50px', background: 'white' }} />
               <p style={{ fontSize: '12px', color: '#64748b', marginTop: '5px' }}>
                 Tip: Gunakan "Enter" untuk membuat paragraf baru.
               </p>

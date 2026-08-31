@@ -103,12 +103,7 @@ export default async function Home() {
             <h2 style={{ fontSize: '2rem', color: '#1e293b', marginBottom: '20px' }}>{sambutan?.title || 'Sambutan Kepala Sekolah'}</h2>
             
             {sambutan?.content ? (
-              // Tampilkan seluruh paragraf
-              sambutan.content.split('\n').filter(p => p.trim() !== '').map((paragraph, idx) => (
-                <p key={idx} style={{ color: '#475569', marginBottom: '15px', lineHeight: '1.8', fontSize: '0.95rem', textAlign: 'justify' }}>
-                  {paragraph}
-                </p>
-              ))
+              <div className="rich-text-content" dangerouslySetInnerHTML={{ __html: sambutan.content.replace(/&nbsp;|\u00A0/g, ' ') }} />
             ) : (
               <>
                 <p style={{ color: '#475569', marginBottom: '15px', fontSize: '0.95rem' }}>
