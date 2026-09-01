@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
-export async function middleware(request) {
+export async function proxy(request) {
   const { pathname } = request.nextUrl;
 
   // Protect all /admin routes except /admin/login
@@ -37,7 +37,7 @@ export async function middleware(request) {
   return NextResponse.next();
 }
 
-// Ensure middleware only runs on necessary paths to save execution time
+// Ensure proxy only runs on necessary paths to save execution time
 export const config = {
   matcher: ['/admin/:path*'],
 };
