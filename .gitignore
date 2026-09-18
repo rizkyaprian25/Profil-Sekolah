@@ -66,3 +66,29 @@ generate-pages.js
 # Uploaded Media (Preserve folder structure with .gitkeep)
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# AI Assistants & Tools (Copilot, Gemini, Cursor, Claude, Antigravity, etc.)
+.agents/
+.gemini/
+.cursor/
+.cursorrules
+.claude/
+.copilot/
+.cline/
+.roo/
+.windsurf/
+.ai/
+copilot-instructions.md
+.github/copilot-instructions.md
+.github/instructions/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+
+# Documentation & Markdown (Ignore all .md files except README.md)
+*.md
+**/*.md
+!README.md
+!readme.md
+!**/README.md
+!**/readme.md
